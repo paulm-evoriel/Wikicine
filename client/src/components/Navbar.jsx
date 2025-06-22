@@ -45,7 +45,7 @@ export default function Navbar({ theme, setTheme }) {
 
   return (
     <>
-      <div className="navbar bg-base-200">
+      <div className="navbar bg-base-200 fixed top-0 w-full z-50">
         <div className="flex">
           <Link to="/" className="btn btn-ghost text-xl">
             <img
@@ -62,9 +62,12 @@ export default function Navbar({ theme, setTheme }) {
             placeholder="Rechercher..."
             className="input input-bordered w-full max-w-xs hidden sm:block"
           />
-          <button className="btn btn-sm ml-2 hidden sm:inline-block">
+          <Link
+            to="/movies"
+            className="btn btn-sm ml-2 hidden sm:inline-flex items-center justify-center"
+          >
             🎬 Films
-          </button>
+          </Link>
           <button className="btn btn-sm hidden sm:inline-block">
             👥 Membre
           </button>
@@ -95,7 +98,7 @@ export default function Navbar({ theme, setTheme }) {
               className="menu menu-sm dropdown-content mt-3 z-[9999] p-2 shadow bg-base-100 rounded-box w-52"
             >
               <li>
-                <a>🎬 Films</a>
+                <Link to="/movies">🎬 Films</Link>
               </li>
               <li>
                 <a>👥 Membre</a>

@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import MoviesPage from "./pages/MoviesPage";
 
 export default function App() {
   const [theme, setTheme] = useState(
@@ -20,6 +21,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home theme={theme} />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/movies" element={<MoviesPage />} />
       </Routes>
     </div>
   );
