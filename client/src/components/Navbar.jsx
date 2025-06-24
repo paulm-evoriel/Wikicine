@@ -45,7 +45,7 @@ export default function Navbar({ theme, setTheme }) {
 
   return (
     <>
-      <div className="navbar bg-base-200 fixed top-0 w-full z-50">
+      <div className="pl-6 navbar bg-base-200 fixed top-0 w-full z-50 relative">
         <div className="flex">
           <Link to="/" className="btn btn-ghost text-xl">
             <img
@@ -56,27 +56,24 @@ export default function Navbar({ theme, setTheme }) {
             Wikicine
           </Link>
         </div>
-        <div className="flex-1 flex justify-center items-center gap-2">
-          <input
-            type="text"
-            placeholder="Rechercher..."
-            className="input input-bordered w-full max-w-xs hidden sm:block"
-          />
+        <div className="absolute left-1/2 -translate-x-1/2 top-0 h-full flex items-center gap-2 hidden sm:flex">
           <Link
             to="/movies"
-            className="btn btn-sm ml-2 hidden sm:inline-flex items-center justify-center"
+            className="btn btn-sm ml-2 inline-flex items-center justify-center"
           >
             🎬 Films
           </Link>
-          <button className="btn btn-sm hidden sm:inline-block">
-            👥 Membre
-          </button>
-          <button className="btn btn-sm hidden sm:inline-block">
-            📋 Liste
-          </button>
+          <button className="btn btn-sm inline-block">👥 Membre</button>
+          <button className="btn btn-sm inline-block">📋 Liste</button>
         </div>
-        <div className="flex items-center mr-0 sm:mr-4 gap-2">
-          <div className="sm:hidden dropdown dropdown-end">
+        <div className="flex items-center gap-2 ml-auto">
+          <input
+            type="text"
+            placeholder="Rechercher..."
+            className="input input-bordered w-full max-w-xs hidden lg:block"
+            style={{ minWidth: "150px" }}
+          />
+          <div className="dropdown dropdown-end lg:hidden">
             <label tabIndex={0} className="btn btn-ghost btn-circle">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -97,13 +94,13 @@ export default function Navbar({ theme, setTheme }) {
               tabIndex={0}
               className="menu menu-sm dropdown-content mt-3 z-[9999] p-2 shadow bg-base-100 rounded-box w-52"
             >
-              <li>
+              <li className="block sm:hidden">
                 <Link to="/movies">🎬 Films</Link>
               </li>
-              <li>
+              <li className="block sm:hidden">
                 <a>👥 Membre</a>
               </li>
-              <li>
+              <li className="block sm:hidden">
                 <a>📋 Liste</a>
               </li>
               <li>
