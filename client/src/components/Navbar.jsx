@@ -1,14 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import logoWikicine from "../../image/wikicine.svg";
 import accountIcon from "../../image/account.svg";
 import test from "../../image/test.png";
-import LoginForm from './Login';
-import RegisterForm from './Register';
+import LoginForm from "./Login";
+import RegisterForm from "./Register";
 
-export default function Navbar({ theme, setTheme }) {
+export default function Navbar({ theme, setTheme, user, setUser }) {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterMode, setIsRegisterMode] = useState(false);
+
+  const handleLoginSuccess = () => {
+    setIsLoginModalOpen(false);
+    const token = localStorage.getItem("token");
+    if (token) {
+      fetch("http://localhost:5000/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.user) setUser(data.user);
+        });
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+  };
 
   const openLoginModal = () => {
     setIsLoginModalOpen(true);
@@ -108,18 +127,41 @@ export default function Navbar({ theme, setTheme }) {
             }}
             aria-label="Changer de thème"
           />
-          <button onClick={openLoginModal} className="btn btn-ghost btn-circle">
-            <img
-              src={theme === "dark" ? test : accountIcon}
-              alt="Compte utilisateur"
-              className="h-8 w-8"
-            />
-          </button>
+          {user ? (
+            <div className="dropdown dropdown-end">
+              <button className="btn btn-ghost btn-circle">
+                <img
+                  src={theme === "dark" ? test : accountIcon}
+                  alt="Compte utilisateur"
+                  className="h-8 w-8"
+                />
+              </button>
+              <ul className="menu menu-sm dropdown-content mt-3 z-[9999] p-2 shadow bg-base-100 rounded-box w-52">
+                <li>
+                  <span>👤 {user.username}</span>
+                </li>
+                <li>
+                  <button onClick={handleLogout}>Se déconnecter</button>
+                </li>
+              </ul>
+            </div>
+          ) : (
+            <button
+              onClick={openLoginModal}
+              className="btn btn-ghost btn-circle"
+            >
+              <img
+                src={theme === "dark" ? test : accountIcon}
+                alt="Compte utilisateur"
+                className="h-8 w-8"
+              />
+            </button>
+          )}
         </div>
       </div>
 
       {/* Modal de connexion/inscription */}
-      {isLoginModalOpen && (
+      {isLoginModalOpen && !user && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
           onClick={closeLoginModal}
@@ -143,14 +185,17 @@ export default function Navbar({ theme, setTheme }) {
               <>
                 <RegisterForm onSuccess={closeLoginModal} />
                 <div className="text-center mt-2">
-                  <button className="link" onClick={() => setIsRegisterMode(false)}>
+                  <button
+                    className="link"
+                    onClick={() => setIsRegisterMode(false)}
+                  >
                     Déjà un compte ? Se connecter
                   </button>
                 </div>
               </>
             ) : (
               <>
-                <LoginForm onSuccess={closeLoginModal} />
+                <LoginForm onSuccess={handleLoginSuccess} />
                 <div className="text-center mt-2">
                   <button className="link" onClick={openRegisterModal}>
                     Pas de compte ? S'inscrire
