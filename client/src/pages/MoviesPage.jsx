@@ -52,7 +52,7 @@ export default function MoviesPage() {
 
   return (
     <div className="pt-12 bg-base-100 text-base-content min-h-screen">
-      <h1 className="pb-8 text-2xl font-bold text-center">Top 3 Box Office</h1>
+      <h1 className="pb-12 text-2xl font-bold text-center">Top 3 Box Office</h1>
       <div className="flex justify-center items-end gap-8 px-4">
         {[1, 0, 2].map((orderIdx, i) => {
           const movie = movies[orderIdx];
@@ -62,7 +62,9 @@ export default function MoviesPage() {
           else marginBottom = "mb-4";
           return (
             <Link to={`/movie/${movie.id}`} key={movie.id}>
-              <div className={`relative w-64 ${marginBottom}`}>
+              <div
+                className={`relative w-64 ${marginBottom} transition-transform duration-300 hover:-translate-y-4 hover:scale-105`}
+              >
                 <img
                   src={movie.poster}
                   alt={`Film classé n°${movie.rank}`}

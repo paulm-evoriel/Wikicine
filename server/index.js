@@ -51,6 +51,39 @@ app.get("/movies/:id", async (req, res) => {
   }
 });
 
+// Route pour récupérer le casting (réalisateurs et acteurs) d'un film
+app.get("/movies/:id/cast", async (req, res) => {
+  const { id } = req.params;
+  try {
+    // Récupérer les réalisateurs
+    const directorsResult = await pool.query(
+      `SELECT d.id, d.first_name, d.last_name, d.nationality_id, d.photo, md.role
+       FROM movie_directors md
+       JOIN directors d ON md.director_id = d.id
+       WHERE md.movie_id = $1`,
+      [id]
+    );
+    // Récupérer les acteurs
+    const actorsResult = await pool.query(
+      `SELECT a.id, a.first_name, a.last_name, a.nationality_id, a.photo, ma.character_name, ma.role_type
+       FROM movie_actors ma
+       JOIN actors a ON ma.actor_id = a.id
+       WHERE ma.movie_id = $1
+       ORDER BY ma.role_type DESC, a.last_name ASC` /* lead d'abord, puis supporting, etc. */,
+      [id]
+    );
+    res.json({
+      directors: directorsResult.rows,
+      actors: actorsResult.rows,
+    });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la récupération du casting" });
+  }
+});
+
 // Inscription
 app.post("/register", async (req, res) => {
   const { username, email, password } = req.body;

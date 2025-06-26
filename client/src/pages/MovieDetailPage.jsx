@@ -6,6 +6,7 @@ export default function MovieDetailPage() {
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [cast, setCast] = useState({ directors: [], actors: [] });
 
   useEffect(() => {
     fetch(`http://localhost:5000/movies/${id}`)
@@ -23,6 +24,20 @@ export default function MovieDetailPage() {
         console.error("Erreur lors de la récupération du film:", err);
         setError(err.message);
         setLoading(false);
+      });
+  }, [id]);
+
+  // Récupérer le casting (réalisateurs et acteurs)
+  useEffect(() => {
+    fetch(`http://localhost:5000/movies/${id}/cast`)
+      .then((response) => {
+        if (!response.ok)
+          throw new Error("Erreur lors du chargement du casting");
+        return response.json();
+      })
+      .then((data) => setCast(data))
+      .catch((err) => {
+        console.error("Erreur lors de la récupération du casting:", err);
       });
   }, [id]);
 
@@ -77,6 +92,29 @@ export default function MovieDetailPage() {
         <div className="md:w-2/3">
           <h1 className="text-4xl font-bold mb-4">{movie.title}</h1>
           <p className="mb-4">{movie.synopsis}</p>
+          {/* Affichage des réalisateurs */}
+          {cast.directors.length > 0 && (
+            <div className="mb-2">
+              <strong>Réalisateur(s)&nbsp;:</strong>{" "}
+              {cast.directors
+                .map((d) => `${d.first_name} ${d.last_name}`)
+                .join(", ")}
+            </div>
+          )}
+          {/* Affichage des acteurs */}
+          {cast.actors.length > 0 && (
+            <div className="mb-2">
+              <strong>Acteurs principaux&nbsp;:</strong>{" "}
+              {cast.actors
+                .map(
+                  (a) =>
+                    `${a.first_name} ${a.last_name}${
+                      a.character_name ? ` (${a.character_name})` : ""
+                    }`
+                )
+                .join(", ")}
+            </div>
+          )}
           <div className="flex flex-col gap-2">
             <p>
               <strong>Date de sortie:</strong>{" "}
