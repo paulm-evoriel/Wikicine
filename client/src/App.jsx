@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import MoviesPage from "./pages/MoviesPage";
+import Register from "./pages/Register";
 import TierList from "./pages/TierList";
 
 export default function App() {
@@ -22,6 +23,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home theme={theme} />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/movies" element={<MoviesPage />} />
         <Route
           path="/tierlist"

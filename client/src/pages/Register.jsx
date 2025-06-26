@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-export default function Login() {
+export default function Register() {
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -11,17 +12,16 @@ export default function Login() {
     e.preventDefault();
     setError('');
     try {
-      const response = await fetch('http://localhost:5000/login', {
+      const response = await fetch('http://localhost:5000/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ username, email, password })
       });
       const data = await response.json();
-      if (response.ok && data.token) {
-        localStorage.setItem('token', data.token);
-        navigate('/'); // Redirige vers la page d'accueil ou une page protégée
+      if (response.ok) {
+        navigate('/login'); // Redirige vers la page de connexion
       } else {
-        setError(data.error || 'Erreur de connexion');
+        setError(data.error || 'Erreur lors de l\'inscription');
       }
     } catch (err) {
       setError('Erreur réseau');
@@ -30,8 +30,14 @@ export default function Login() {
 
   return (
     <div className="p-4 bg-base-100 text-base-content min-h-screen">
-      <h1 className="text-2xl font-bold mb-4">Connexion</h1>
+      <h1 className="text-2xl font-bold mb-4">Créer un compte</h1>
       <form className="grid gap-4" onSubmit={handleSubmit}>
+        <input
+          className="input input-bordered"
+          placeholder="Nom d'utilisateur"
+          value={username}
+          onChange={e => setUsername(e.target.value)}
+        />
         <input
           className="input input-bordered"
           placeholder="Email"
@@ -45,12 +51,9 @@ export default function Login() {
           value={password}
           onChange={e => setPassword(e.target.value)}
         />
-        <button className="btn btn-primary" type="submit">Se connecter</button>
+        <button className="btn btn-primary" type="submit">S'inscrire</button>
         {error && <div className="text-red-500">{error}</div>}
-        <div className="text-center">
-          <Link to="/register" className="link">Pas de compte ? S'inscrire</Link>
-        </div>
       </form>
     </div>
   );
-}
+} 
