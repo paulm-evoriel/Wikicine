@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import MoviesPage from "./pages/MoviesPage";
+import MovieDetailPage from "./pages/MovieDetailPage";
 import Register from "./pages/Register";
 import TierList from "./pages/TierList";
 
@@ -25,6 +26,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/movies" element={<MoviesPage />} />
+        <Route path="/movie/:id" element={<MovieDetailPage />} />
         <Route
           path="/tierlist"
           element={<TierList theme={theme} setTheme={setTheme} />}
