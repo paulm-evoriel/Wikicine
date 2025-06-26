@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
-import Login from "./pages/Login";
+import Login from "./components/Login";
 import MoviesPage from "./pages/MoviesPage";
-import Register from "./pages/Register";
+import Register from "./components/Register";
 import TierList from "./pages/TierList";
 
 export default function App() {

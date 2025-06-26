@@ -3,44 +3,25 @@ import { Link } from "react-router-dom";
 import logoWikicine from "../../image/wikicine.svg";
 import accountIcon from "../../image/account.svg";
 import test from "../../image/test.png";
+import LoginForm from './Login';
+import RegisterForm from './Register';
 
 export default function Navbar({ theme, setTheme }) {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterMode, setIsRegisterMode] = useState(false);
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-    confirmPassword: "",
-  });
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (isRegisterMode && formData.password !== formData.confirmPassword) {
-      alert("Les mots de passe ne correspondent pas");
-      return;
-    }
-    // Ici vous pouvez ajouter la logique de connexion/inscription
-    console.log("Données du formulaire:", formData);
-    setIsLoginModalOpen(false);
-    setFormData({ username: "", password: "", confirmPassword: "" });
-  };
 
   const openLoginModal = () => {
     setIsLoginModalOpen(true);
     setIsRegisterMode(false);
   };
 
+  const openRegisterModal = () => {
+    setIsLoginModalOpen(true);
+    setIsRegisterMode(true);
+  };
+
   const closeLoginModal = () => {
     setIsLoginModalOpen(false);
-    setFormData({ username: "", password: "", confirmPassword: "" });
   };
 
   return (
@@ -158,76 +139,25 @@ export default function Navbar({ theme, setTheme }) {
                 ✕
               </button>
             </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="label">
-                  <span className="label-text text-base-content">
-                    Nom d'utilisateur
-                  </span>
-                </label>
-                <input
-                  type="text"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleInputChange}
-                  className="input input-bordered w-full bg-base-200 text-base-content"
-                  placeholder="Entrez votre nom d'utilisateur"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="label">
-                  <span className="label-text text-base-content">
-                    Mot de passe
-                  </span>
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className="input input-bordered w-full bg-base-200 text-base-content"
-                  placeholder="Entrez votre mot de passe"
-                  required
-                />
-              </div>
-
-              {isRegisterMode && (
-                <div>
-                  <label className="label">
-                    <span className="label-text text-base-content">
-                      Confirmer le mot de passe
-                    </span>
-                  </label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleInputChange}
-                    className="input input-bordered w-full bg-base-200 text-base-content"
-                    placeholder="Confirmez votre mot de passe"
-                    required
-                  />
+            {isRegisterMode ? (
+              <>
+                <RegisterForm onSuccess={closeLoginModal} />
+                <div className="text-center mt-2">
+                  <button className="link" onClick={() => setIsRegisterMode(false)}>
+                    Déjà un compte ? Se connecter
+                  </button>
                 </div>
-              )}
-
-              <button type="submit" className="btn btn-primary w-full">
-                {isRegisterMode ? "S'inscrire" : "Se connecter"}
-              </button>
-            </form>
-
-            <div className="mt-4 text-center">
-              <button
-                onClick={() => setIsRegisterMode(!isRegisterMode)}
-                className="btn btn-link text-base-content"
-              >
-                {isRegisterMode
-                  ? "Déjà un compte ? Se connecter"
-                  : "Pas de compte ? S'inscrire"}
-              </button>
-            </div>
+              </>
+            ) : (
+              <>
+                <LoginForm onSuccess={closeLoginModal} />
+                <div className="text-center mt-2">
+                  <button className="link" onClick={openRegisterModal}>
+                    Pas de compte ? S'inscrire
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
