@@ -1,4 +1,4 @@
-﻿--
+--
 -- PostgreSQL database dump
 --
 
@@ -1121,9 +1121,9 @@ COPY public.movie_studios (movie_id, studio_id, role) FROM stdin;
 --
 
 COPY public.movies (id, title, original_title, synopsis, release_date, duration, poster, trailer_url, country_id, language, budget, box_office, imdb_id, tmdb_id, status, is_verified, added_by_user_id, created_at, updated_at) FROM stdin;
-1	Barbie	Barbie	Une poupée vivant dans Barbieland est expulsée du pays pour être loin d'être assez parfaite.	2023-07-21	114	\N	\N	1	en	145000000	1441000000	\N	\N	released	f	1	2025-06-25 17:07:57.155331	2025-06-25 17:07:57.155331
-2	Oppenheimer	Oppenheimer	L'histoire du scientifique américain J. Robert Oppenheimer et de son rôle dans le développement de la bombe atomique.	2023-07-21	180	\N	\N	1	en	100000000	950000000	\N	\N	released	f	1	2025-06-25 17:07:57.155331	2025-06-25 17:07:57.155331
-3	Avatar: La Voie de l'eau	Avatar: The Way of Water	Jake Sully et Neytiri ont formé une famille et font tout pour rester aussi soudés que possible.	2022-12-14	192	\N	\N	1	en	350000000	2320000000	\N	\N	released	f	1	2025-06-25 17:07:57.155331	2025-06-25 17:07:57.155331
+1	Barbie	Barbie	Une poupée vivant dans Barbieland est expulsée du pays pour être loin d'être assez parfaite.	2023-07-21	114	/image/1.png	\N	1	en	145000000	1441000000	\N	\N	released	f	1	2025-06-25 17:07:57.155331	2025-06-25 17:07:57.155331
+2	Oppenheimer	Oppenheimer	L'histoire du scientifique américain J. Robert Oppenheimer et de son rôle dans le développement de la bombe atomique.	2023-07-21	180	/image/2.png	\N	1	en	100000000	950000000	\N	\N	released	f	1	2025-06-25 17:07:57.155331	2025-06-25 17:07:57.155331
+3	Avatar: La Voie de l'eau	Avatar: The Way of Water	Jake Sully et Neytiri ont formé une famille et font tout pour rester aussi soudés que possible.	2022-12-14	192	/image/3.png	\N	1	en	350000000	2320000000	\N	\N	released	f	1	2025-06-25 17:07:57.155331	2025-06-25 17:07:57.155331
 \.
 
 
