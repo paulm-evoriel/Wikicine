@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import MoviesPage from "./pages/MoviesPage";
+import TierList from "./pages/TierList";
 
 export default function App() {
   const [theme, setTheme] = useState(
@@ -22,6 +23,10 @@ export default function App() {
         <Route path="/" element={<Home theme={theme} />} />
         <Route path="/login" element={<Login />} />
         <Route path="/movies" element={<MoviesPage />} />
+        <Route
+          path="/tierlist"
+          element={<TierList theme={theme} setTheme={setTheme} />}
+        />
       </Routes>
     </div>
   );
