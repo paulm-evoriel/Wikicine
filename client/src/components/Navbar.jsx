@@ -64,7 +64,12 @@ export default function Navbar({ theme, setTheme }) {
             🎬 Films
           </Link>
           <button className="btn btn-sm inline-block">👥 Membre</button>
-          <button className="btn btn-sm inline-block">📋 Liste</button>
+          <Link
+            to="/tierlist"
+            className="btn btn-sm inline-flex items-center justify-center"
+          >
+            📋 Liste
+          </Link>
         </div>
         <div className="flex items-center gap-2 ml-auto">
           <input
@@ -101,7 +106,7 @@ export default function Navbar({ theme, setTheme }) {
                 <a>👥 Membre</a>
               </li>
               <li className="block sm:hidden">
-                <a>📋 Liste</a>
+                <Link to="/tierlist">📋 Liste</Link>
               </li>
               <li>
                 <input
