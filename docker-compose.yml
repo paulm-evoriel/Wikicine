@@ -9,7 +9,7 @@ services:
       - ./client:/app
       - /app/node_modules
     environment:
-      - VITE_API_URL=http://server:5000
+      - VITE_API_URL=http://localhost:5000
     depends_on:
       - server
 
@@ -36,7 +36,8 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./server/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./dump.sql:/docker-entrypoint-initdb.d/dump.sql:ro
+      - ./fix_sequences.sql:/docker-entrypoint-initdb.d/fix_sequences.sql:ro
       - pgdata:/var/lib/postgresql/data
 
 volumes:
