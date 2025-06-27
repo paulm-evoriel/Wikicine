@@ -84,6 +84,71 @@ app.get("/movies/:id/cast", async (req, res) => {
   }
 });
 
+// Récupérer les reviews d'un film (pagination)
+app.get("/movies/:id/reviews", async (req, res) => {
+  const { id } = req.params;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const offset = (page - 1) * limit;
+  try {
+    const reviewsResult = await pool.query(
+      `SELECT r.*, u.username FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.movie_id = $1 ORDER BY r.created_at DESC LIMIT $2 OFFSET $3`,
+      [id, limit, offset]
+    );
+    const countResult = await pool.query(
+      `SELECT COUNT(*) FROM reviews WHERE movie_id = $1`, [id]
+    );
+    res.json({
+      reviews: reviewsResult.rows,
+      total: parseInt(countResult.rows[0].count),
+      page,
+      limit
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur lors de la récupération des reviews" });
+  }
+});
+
+// Ajouter une review (authentifié)
+app.post("/movies/:id/reviews", authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const user_id = req.user.id;
+  const { rating, content } = req.body;
+  if (!rating) {
+    return res.status(400).json({ error: "La note est obligatoire" });
+  }
+  try {
+    const result = await pool.query(
+      `INSERT INTO reviews (user_id, movie_id, rating, content) VALUES ($1, $2, $3, $4) RETURNING *`,
+      [user_id, id, rating, content || null]
+    );
+    res.status(201).json({ review: result.rows[0] });
+  } catch (err) {
+    if (err.code === "23505") {
+      res.status(409).json({ error: "Vous avez déjà noté ce film" });
+    } else {
+      console.error(err);
+      res.status(500).json({ error: "Erreur lors de l'ajout de la review" });
+    }
+  }
+});
+
+// Note moyenne du film
+app.get("/movies/:id/rating", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT AVG(rating) as average_rating, COUNT(*) as count FROM reviews WHERE movie_id = $1`,
+      [id]
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur lors de la récupération de la note moyenne" });
+  }
+});
+
 // Inscription
 app.post("/register", async (req, res) => {
   const { username, email, password } = req.body;
@@ -161,6 +226,40 @@ app.get("/me", authenticateToken, async (req, res) => {
     res.json({ user: result.rows[0] });
   } catch (err) {
     res.status(500).json({ error: "Erreur lors de la récupération du profil" });
+  }
+});
+
+// Dernières reviews (10 plus récentes)
+app.get("/reviews/latest", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT r.id, r.rating, r.content, r.created_at, u.username, m.id as movie_id, m.title as movie_title, m.poster
+      FROM reviews r
+      JOIN users u ON r.user_id = u.id
+      JOIN movies m ON r.movie_id = m.id
+      ORDER BY r.created_at DESC
+      LIMIT 10
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur lors de la récupération des dernières reviews" });
+  }
+});
+
+// Derniers films ajoutés (10 plus récents)
+app.get("/movies/latest", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT id, title, poster, created_at
+      FROM movies
+      ORDER BY created_at DESC
+      LIMIT 10
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur lors de la récupération des derniers films" });
   }
 });
 
