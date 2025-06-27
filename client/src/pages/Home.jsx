@@ -4,6 +4,8 @@ import mousquetairesImg from "../../image/12.png";
 import wonkaImg from "../../image/10.png";
 import { useState, useEffect } from "react";
 import RegisterForm from "../components/Register";
+import Aurora from "../effects/Aurora";
+import ScrollFloat from "../effects/ScrollFloat";
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -70,6 +72,12 @@ export default function Home({ theme, user, setUser }) {
         <h2 className="text-xl font-semibold mb-2">
           Comment fonctionne Wikicine&nbsp;?
         </h2>
+        <Aurora
+          colorStops={["#5227FF", "#7CFF67", "#5227FF"]}
+          blend={0.6}
+          amplitude={1.0}
+          speed={0.5}
+        />
         <p>
           Wikicine est une plateforme collaborative dédiée au cinéma. Vous
           pouvez explorer les films à l'affiche, consulter des fiches

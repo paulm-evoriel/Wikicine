@@ -11,7 +11,7 @@ ENV NODE_ENV=development
 COPY package*.json ./
 
 # 4. Installer les dépendances React, Vite, Tailwind, DaisyUI, etc.
-RUN npm install && npm install -g vite && ls -l node_modules/.bin && npx vite --version
+RUN npm install && npm install gsap ogl && npm install -g vite && ls -l node_modules/.bin && npx vite --version
 
 # 5. Copier le reste des fichiers du frontend
 COPY . .
