@@ -197,6 +197,11 @@ export default function Navbar({ theme, setTheme, user, setUser }) {
                 <li>
                   <span>👤 {user.username}</span>
                 </li>
+                {user.is_admin && (
+                  <li>
+                    <Link to="/admin/verify-movies" className="text-red-600 font-semibold">Modération</Link>
+                  </li>
+                )}
                 <li>
                   <button onClick={handleLogout}>Se déconnecter</button>
                 </li>
