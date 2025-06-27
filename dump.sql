@@ -1010,6 +1010,11 @@ COPY public.actors (id, first_name, last_name, nationality_id, date_of_birth, da
 1	Margot	Robbie	1	\N	\N	\N	\N	2025-06-25 17:07:57.113377
 2	Tom	Cruise	1	\N	\N	\N	\N	2025-06-25 17:07:57.113377
 3	Robert	Downey Jr.	1	\N	\N	\N	\N	2025-06-25 17:07:57.113377
+4	Leonardo	DiCaprio	1	1974-11-11	\N	\N	\N	2025-06-27 13:52:59.066463
+5	Brad	Pitt	1	1963-12-18	\N	\N	\N	2025-06-27 13:52:59.066463
+6	Tom	Cruise	1	1962-07-03	\N	\N	\N	2025-06-27 13:52:59.066463
+7	Morgan	Freeman	1	1937-06-01	\N	\N	\N	2025-06-27 13:52:59.066463
+8	Robert	De Niro	1	1943-08-17	\N	\N	\N	2025-06-27 13:52:59.066463
 \.
 
 
@@ -1037,6 +1042,8 @@ COPY public.countries (id, name, code) FROM stdin;
 1	United States	USA
 2	China	CHN
 3	United Kingdom	GBR
+5	France	FRA
+6	Japon	JPN
 \.
 
 
@@ -1048,6 +1055,10 @@ COPY public.directors (id, first_name, last_name, nationality_id, date_of_birth,
 1	Christopher	Nolan	3	\N	\N	\N	\N	2025-06-25 17:07:57.063678
 2	Greta	Gerwig	1	\N	\N	\N	\N	2025-06-25 17:07:57.063678
 3	James	Cameron	1	\N	\N	\N	\N	2025-06-25 17:07:57.063678
+4	Christopher	Nolan	3	1970-07-30	\N	\N	\N	2025-06-27 13:52:59.012557
+5	Martin	Scorsese	1	1942-11-17	\N	\N	\N	2025-06-27 13:52:59.012557
+6	Quentin	Tarantino	1	1963-03-27	\N	\N	\N	2025-06-27 13:52:59.012557
+7	Steven	Spielberg	1	1946-12-18	\N	\N	\N	2025-06-27 13:52:59.012557
 \.
 
 
@@ -1063,6 +1074,10 @@ COPY public.genres (id, name, description) FROM stdin;
 5	Drama	\N
 6	Science Fiction	\N
 7	Fantasy	\N
+8	Drame	Films dramatiques
+9	Science-Fiction	Films de science-fiction
+10	Comédie	Films humoristiques
+11	Aventure	Films d'aventure
 \.
 
 
@@ -1072,6 +1087,15 @@ COPY public.genres (id, name, description) FROM stdin;
 
 COPY public.movie_actors (movie_id, actor_id, character_name, role_type, order_index) FROM stdin;
 1	1	\N	lead	\N
+4	4	Dom Cobb	lead	\N
+8	4	Jordan Belfort	lead	\N
+12	8	James Conway	lead	\N
+6	8	Vito Corleone	lead	\N
+5	7	Red	lead	\N
+13	4	Calvin Candie	supporting	\N
+11	6	Captain Miller	lead	\N
+11	2	Captain Miller	lead	\N
+7	5	Floyd	supporting	\N
 \.
 
 
@@ -1083,6 +1107,14 @@ COPY public.movie_directors (movie_id, director_id, role) FROM stdin;
 1	2	Director
 2	1	Director
 3	3	Director
+1	1	Director
+6	1	Director
+3	2	Director
+5	2	Director
+4	3	Director
+10	3	Director
+7	4	Director
+8	4	Director
 \.
 
 
@@ -1113,6 +1145,26 @@ COPY public.movie_studios (movie_id, studio_id, role) FROM stdin;
 1	2	production
 2	1	production
 3	4	production
+10	1	production
+8	1	distribution
+12	2	production
+9	2	distribution
+5	2	distribution
+4	2	production
+11	5	distribution
+9	5	production
+8	5	production
+6	5	production
+12	6	production
+9	6	distribution
+5	6	distribution
+4	6	production
+10	7	production
+8	7	distribution
+11	8	distribution
+9	8	production
+8	8	production
+6	8	production
 \.
 
 
@@ -1124,6 +1176,16 @@ COPY public.movies (id, title, original_title, synopsis, release_date, duration,
 1	Barbie	Barbie	Une poupée vivant dans Barbieland est expulsée du pays pour être loin d'être assez parfaite.	2023-07-21	114	/image/1.png	\N	1	en	145000000	1441000000	\N	\N	released	f	1	2025-06-25 17:07:57.155331	2025-06-25 17:07:57.155331
 2	Oppenheimer	Oppenheimer	L'histoire du scientifique américain J. Robert Oppenheimer et de son rôle dans le développement de la bombe atomique.	2023-07-21	180	/image/2.png	\N	1	en	100000000	950000000	\N	\N	released	f	1	2025-06-25 17:07:57.155331	2025-06-25 17:07:57.155331
 3	Avatar: La Voie de l'eau	Avatar: The Way of Water	Jake Sully et Neytiri ont formé une famille et font tout pour rester aussi soudés que possible.	2022-12-14	192	/image/3.png	\N	1	en	350000000	2320000000	\N	\N	released	f	1	2025-06-25 17:07:57.155331	2025-06-25 17:07:57.155331
+4	Inception	Inception	Dom Cobb est un voleur expérimenté, le meilleur dans l'art dangereux de l'extraction : sa spécialité consiste à s'approprier les secrets les plus précieux d'un individu, enfouis au plus profond de son subconscient, pendant qu'il rêve et que son esprit est particulièrement vulnérable.	2010-07-16	148	\N	\N	1	English	\N	\N	\N	\N	released	f	\N	2025-06-27 13:52:59.419577	2025-06-27 13:52:59.419577
+5	Les Évadés	The Shawshank Redemption	En 1947, Andy Dufresne, un banquier, est condamné à la prison à vie pour le meurtre de sa femme et de son amant. Ayant beau clamer son innocence, il est emprisonné à Shawshank, le pénitencier d'État du Maine. Il y fait la rencontre de Red, un contrebandier noir américain emprisonné depuis vingt ans.	1994-09-23	142	\N	\N	1	English	\N	\N	\N	\N	released	f	\N	2025-06-27 13:52:59.419577	2025-06-27 13:52:59.419577
+6	Le Parrain	The Godfather	En 1945, à New York, les Corleone sont une des cinq familles de la mafia. Don Vito Corleone, 'parrain' de cette famille, marie sa fille à un bookmaker. Sollozzo, 'parrain' de la famille Tattaglia, propose à Don Vito une association dans le trafic de drogue, mais celui-ci refuse.	1972-03-24	175	\N	\N	1	English	\N	\N	\N	\N	released	f	\N	2025-06-27 13:52:59.419577	2025-06-27 13:52:59.419577
+7	Pulp Fiction	Pulp Fiction	L'odyssée sanglante et burlesque de petits malfrats dans la jungle de Hollywood à travers trois histoires qui s'entremêlent. Dans un restaurant, un couple de jeunes braqueurs, Pumpkin et Honey Bunny, discutent des risques que comporte leur activité.	1994-10-14	154	\N	\N	1	English	\N	\N	\N	\N	released	f	\N	2025-06-27 13:52:59.419577	2025-06-27 13:52:59.419577
+8	Le Loup de Wall Street	The Wolf of Wall Street	L'histoire vraie de Jordan Belfort, un courtier en bourse qui passa vingt mois en prison pour avoir refusé de participer à une gigantesque arnaque, dévoilant la corruption et l'implication de la pègre qui sévit derrière les portes closes de Wall Street.	2013-12-25	180	\N	\N	1	English	\N	\N	\N	\N	released	f	\N	2025-06-27 13:52:59.419577	2025-06-27 13:52:59.419577
+9	Interstellar	Interstellar	Dans un futur proche, la Terre est devenue hostile pour l'homme. Les tempêtes de sable sont fréquentes et les récoltes de plus en plus rares. Cooper, un ancien pilote de la NASA, vit avec sa famille dans une ferme. Avec sa fille Murphy, il découvre que des phénomènes étranges se produisent dans sa maison.	2014-11-07	169	\N	\N	1	English	\N	\N	\N	\N	released	f	\N	2025-06-27 13:52:59.419577	2025-06-27 13:52:59.419577
+10	Les Dents de la mer	Jaws	À quelques jours du début de la saison estivale, les habitants de la petite station balnéaire d'Amity sont mis en émoi par la découverte sur le littoral du corps atrocement mutilé d'une jeune vacancière. Pour Martin Brody, le nouveau chef de la police, il ne fait aucun doute que la jeune fille a été victime d'un requin.	1975-06-20	124	\N	\N	1	English	\N	\N	\N	\N	released	f	\N	2025-06-27 13:52:59.419577	2025-06-27 13:52:59.419577
+11	Il faut sauver le soldat Ryan	Saving Private Ryan	Lors du débarquement des forces alliées en Normandie, trois frères Ryan sont tués au combat. Leur mère, qui vient de recevoir trois télégrammes annonçant leur mort, est effondrée. Le chef d'état-major décide alors d'envoyer une escouade pour retrouver et rapatrier le dernier des frères Ryan.	1998-07-24	169	\N	\N	1	English	\N	\N	\N	\N	released	f	\N	2025-06-27 13:52:59.419577	2025-06-27 13:52:59.419577
+12	Les Affranchis	Goodfellas	Brooklyn, dans les années 1950. Depuis l'enfance, le petit Henry Hill rêve de devenir gangster. À l'âge de onze ans, il intègre la "famille" de Paul Cicero, un caïd local, et commence par travailler pour lui, effectuant ses premières livraisons.	1990-09-19	146	\N	\N	1	English	\N	\N	\N	\N	released	f	\N	2025-06-27 13:52:59.419577	2025-06-27 13:52:59.419577
+13	Django Unchained	Django Unchained	Dans le sud des États-Unis, deux ans avant la guerre de Sécession, le Dr King Schultz, un chasseur de primes allemand, fait l'acquisition de Django, un esclave qui peut l'aider à traquer les frères Brittle, les meurtriers qu'il recherche.	2012-12-25	165	\N	\N	1	English	\N	\N	\N	\N	released	f	\N	2025-06-27 13:52:59.419577	2025-06-27 13:52:59.419577
 \.
 
 
@@ -1178,6 +1240,10 @@ COPY public.studios (id, name, country_id, founded_year, logo, description, webs
 3	Walt Disney Pictures	1	\N	\N	\N	\N	2025-06-25 17:07:56.984721
 4	20th Century Studios	1	\N	\N	\N	\N	2025-06-25 17:07:56.984721
 5	Paramount Pictures	1	\N	\N	\N	\N	2025-06-25 17:07:56.984721
+6	Warner Bros.	1	1923	\N	\N	\N	2025-06-27 13:52:58.590192
+7	Universal Pictures	1	1912	\N	\N	\N	2025-06-27 13:52:58.590192
+8	Paramount Pictures	1	1912	\N	\N	\N	2025-06-27 13:52:58.590192
+9	20th Century Studios	1	1935	\N	\N	\N	2025-06-27 13:52:58.590192
 \.
 
 
@@ -1244,7 +1310,7 @@ COPY public.watchlists (id, user_id, movie_id, priority, added_at) FROM stdin;
 -- Name: actors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.actors_id_seq', 3, true);
+SELECT pg_catalog.setval('public.actors_id_seq', 8, true);
 
 
 --
@@ -1258,28 +1324,28 @@ SELECT pg_catalog.setval('public.collections_id_seq', 1, false);
 -- Name: countries_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.countries_id_seq', 3, true);
+SELECT pg_catalog.setval('public.countries_id_seq', 6, true);
 
 
 --
 -- Name: directors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.directors_id_seq', 3, true);
+SELECT pg_catalog.setval('public.directors_id_seq', 7, true);
 
 
 --
 -- Name: genres_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.genres_id_seq', 7, true);
+SELECT pg_catalog.setval('public.genres_id_seq', 11, true);
 
 
 --
 -- Name: movies_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.movies_id_seq', 3, true);
+SELECT pg_catalog.setval('public.movies_id_seq', 13, true);
 
 
 --
@@ -1314,7 +1380,7 @@ SELECT pg_catalog.setval('public.reviews_id_seq', 3, true);
 -- Name: studios_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.studios_id_seq', 5, true);
+SELECT pg_catalog.setval('public.studios_id_seq', 9, true);
 
 
 --
