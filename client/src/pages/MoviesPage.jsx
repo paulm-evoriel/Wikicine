@@ -1,36 +1,58 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 export default function MoviesPage() {
   const [movies, setMovies] = useState([]);
+  const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState("title");
+  const [sortDir, setSortDir] = useState("asc");
 
   useEffect(() => {
-    fetch("http://localhost:5000/movies")
+    fetch(`${API_URL}/movies`)
       .then((response) => response.json())
       .then((data) => {
-        // Prendre les 3 premiers films et leur assigner les styles appropriés
-        const topMovies = data.slice(0, 3).map((movie, index) => ({
-          ...movie,
-          rank: index + 1,
-          bgColor:
-            index === 0
-              ? "bg-yellow-400"
-              : index === 1
-              ? "bg-slate-300"
-              : "bg-orange-500",
-          textColor: "text-black",
-        }));
-        setMovies(topMovies);
+        setMovies(data);
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Erreur lors de la récupération des films:", err);
         setError("Erreur lors de la récupération des films");
         setLoading(false);
       });
   }, []);
+
+  // Top 3 box office
+  const top3 = [...movies]
+    .sort((a, b) => (b.box_office || 0) - (a.box_office || 0))
+    .slice(0, 3);
+  const top3Ids = new Set(top3.map(m => m.id));
+
+  useEffect(() => {
+    let res = movies.filter(m => !top3Ids.has(m.id));
+    if (search) {
+      const s = search.toLowerCase();
+      res = res.filter(m => m.title.toLowerCase().includes(s));
+    }
+    res.sort((a, b) => {
+      let v1 = a[sort], v2 = b[sort];
+      if (sort === "box_office") {
+        v1 = v1 || 0; v2 = v2 || 0;
+      }
+      if (v1 == null) return 1;
+      if (v2 == null) return -1;
+      if (typeof v1 === "string") {
+        v1 = v1.toLowerCase(); v2 = v2.toLowerCase();
+      }
+      if (v1 < v2) return sortDir === "asc" ? -1 : 1;
+      if (v1 > v2) return sortDir === "asc" ? 1 : -1;
+      return 0;
+    });
+    setFiltered(res);
+  }, [movies, search, sort, sortDir]);
 
   if (loading) {
     return (
@@ -39,7 +61,6 @@ export default function MoviesPage() {
       </div>
     );
   }
-
   if (error) {
     return (
       <div className="pt-24 bg-base-100 text-base-content min-h-screen flex justify-center items-center">
@@ -52,10 +73,11 @@ export default function MoviesPage() {
 
   return (
     <div className="pt-12 bg-base-100 text-base-content min-h-screen">
-      <h1 className="pb-12 text-2xl font-bold text-center">Top 3 Box Office</h1>
-      <div className="flex justify-center items-end gap-8 px-4">
+      <h1 className="pb-8 text-3xl font-bold text-center font-poppins">Tous les films</h1>
+      {/* Top 3 Box Office */}
+      <div className="flex justify-center items-end gap-8 px-4 mb-12">
         {[1, 0, 2].map((orderIdx, i) => {
-          const movie = movies[orderIdx];
+          const movie = top3[orderIdx];
           if (!movie) return null;
           let marginBottom = "";
           if (i === 1) marginBottom = "mb-16";
@@ -67,18 +89,53 @@ export default function MoviesPage() {
               >
                 <img
                   src={movie.poster}
-                  alt={`Film classé n°${movie.rank}`}
+                  alt={`Film classé n°${orderIdx + 1}`}
                   className="rounded-lg shadow-lg w-full h-auto"
                 />
                 <div
-                  className={`absolute -top-5 left-1/2 transform -translate-x-1/2 w-14 h-14 rounded-full flex items-center justify-center font-bold text-3xl shadow-lg ${movie.bgColor} ${movie.textColor}`}
+                  className={`absolute -top-5 left-1/2 transform -translate-x-1/2 w-14 h-14 rounded-full flex items-center justify-center font-bold text-3xl shadow-lg bg-yellow-400 text-black`}
                 >
-                  <span>{movie.rank}</span>
+                  <span>{orderIdx + 1}</span>
                 </div>
               </div>
             </Link>
           );
         })}
+      </div>
+      {/* Recherche et tri */}
+      <div className="flex flex-col md:flex-row gap-4 justify-between items-center max-w-5xl mx-auto mb-8 px-2">
+        <input
+          type="text"
+          placeholder="Rechercher un film..."
+          className="input input-bordered w-full md:w-1/2"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+        <div className="flex gap-2 items-center">
+          <label className="font-montserrat">Trier par :</label>
+          <select className="select select-bordered" value={sort} onChange={e => setSort(e.target.value)}>
+            <option value="title">Titre</option>
+            <option value="release_date">Date de sortie</option>
+            <option value="box_office">Box Office</option>
+          </select>
+          <button className="btn btn-ghost" onClick={() => setSortDir(d => d === "asc" ? "desc" : "asc")}>{sortDir === "asc" ? "▲" : "▼"}</button>
+        </div>
+      </div>
+      {/* Grille des films */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-7xl mx-auto px-2">
+        {filtered.length === 0 && <div className="col-span-full text-center">Aucun film trouvé.</div>}
+        {filtered.map(movie => (
+          <Link to={`/movie/${movie.id}`} key={movie.id} className="group">
+            <div className="bg-base-200 rounded-xl shadow-lg overflow-hidden hover:scale-105 transition-transform flex flex-col h-full">
+              <img src={movie.poster} alt={movie.title} className="w-full h-64 object-cover" />
+              <div className="p-4 flex-1 flex flex-col">
+                <h2 className="font-bold text-lg font-montserrat mb-1 group-hover:text-primary transition-colors">{movie.title}</h2>
+                {movie.release_date && <div className="text-sm text-gray-500 mb-1">{movie.release_date}</div>}
+                {movie.box_office && <div className="text-sm text-gray-500">Box office : {movie.box_office.toLocaleString()} $</div>}
+              </div>
+            </div>
+          </Link>
+        ))}
       </div>
     </div>
   );
