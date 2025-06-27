@@ -2,11 +2,31 @@ import MovieCard from "../components/MovieCard";
 import duneImg from "../../image/11.png";
 import mousquetairesImg from "../../image/12.png";
 import wonkaImg from "../../image/10.png";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import RegisterForm from "../components/Register";
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+function timeAgo(dateString) {
+  const now = new Date();
+  const date = new Date(dateString);
+  const diff = Math.floor((now - date) / 1000);
+  if (diff < 60) return "à l'instant";
+  if (diff < 3600) return `il y a ${Math.floor(diff/60)} min`;
+  if (diff < 86400) return `il y a ${Math.floor(diff/3600)}h`;
+  if (diff < 172800) return 'hier';
+  return date.toLocaleDateString();
+}
 
 export default function Home({ theme, user, setUser }) {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  const [latestReviews, setLatestReviews] = useState([]);
+  const [latestMovies, setLatestMovies] = useState([]);
+
+  useEffect(() => {
+    fetch(`${API_URL}/reviews/latest`).then(res => res.json()).then(setLatestReviews);
+    fetch(`${API_URL}/movies/latest`).then(res => res.json()).then(setLatestMovies);
+  }, []);
 
   return (
     <div className="pt-8 bg-base-100 text-base-content min-h-screen">
@@ -68,45 +88,21 @@ export default function Home({ theme, user, setUser }) {
             Dernières reviews
           </h3>
           <ul className="space-y-4">
-            <li>
-              <span className="font-semibold">Inception</span> —{" "}
-              <span className="italic">
-                "Un chef-d'œuvre visuel et narratif, à voir absolument !"
-              </span>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-yellow-400">★★★★★</span>
-                <span className="text-sm text-gray-500">
-                  par Alice, il y a 2h
-                </span>
-              </div>
-            </li>
-            <li>
-              <span className="font-semibold">
-                Le Fabuleux Destin d'Amélie Poulain
-              </span>{" "}
-              —{" "}
-              <span className="italic">
-                "Poétique, drôle et touchant. Un film qui fait du bien."
-              </span>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-yellow-400">★★★★☆</span>
-                <span className="text-sm text-gray-500">
-                  par Bob, il y a 5h
-                </span>
-              </div>
-            </li>
-            <li>
-              <span className="font-semibold">Interstellar</span> —{" "}
-              <span className="italic">
-                "Une expérience cinématographique bouleversante."
-              </span>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-yellow-400">★★★★★</span>
-                <span className="text-sm text-gray-500">
-                  par Clara, il y a 1j
-                </span>
-              </div>
-            </li>
+            {latestReviews.length === 0 && <li>Aucune review récente.</li>}
+            {latestReviews.map(r => (
+              <li key={r.id}>
+                <span className="font-semibold">{r.movie_title}</span> — {r.content && <span className="italic">"{r.content}"</span>}
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-yellow-400">
+                    {Array.from({length: Math.round(r.rating/2)}, (_,i) => '★').join('')}
+                    {Array.from({length: 5-Math.round(r.rating/2)}, (_,i) => '☆').join('')}
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    par {r.username}, {timeAgo(r.created_at)}
+                  </span>
+                </div>
+              </li>
+            ))}
           </ul>
         </div>
         {/* Nouveaux films ajoutés */}
@@ -115,40 +111,19 @@ export default function Home({ theme, user, setUser }) {
             Nouveaux films ajoutés
           </h3>
           <ul className="space-y-4">
-            <li className="flex items-center gap-3">
-              <img
-                src={duneImg}
-                alt="Dune: Deuxième Partie"
-                className="w-12 h-16 object-cover rounded shadow"
-              />
-              <div>
-                <span className="font-semibold">Dune: Deuxième Partie</span> —
-                ajouté il y a 30 min
-              </div>
-            </li>
-            <li className="flex items-center gap-3">
-              <img
-                src={mousquetairesImg}
-                alt="Les Trois Mousquetaires: Milady"
-                className="w-12 h-16 object-cover rounded shadow"
-              />
-              <div>
-                <span className="font-semibold">
-                  Les Trois Mousquetaires: Milady
-                </span>{" "}
-                — ajouté il y a 3h
-              </div>
-            </li>
-            <li className="flex items-center gap-3">
-              <img
-                src={wonkaImg}
-                alt="Wonka"
-                className="w-12 h-16 object-cover rounded shadow"
-              />
-              <div>
-                <span className="font-semibold">Wonka</span> — ajouté hier
-              </div>
-            </li>
+            {latestMovies.length === 0 && <li>Aucun film récent.</li>}
+            {latestMovies.map(m => (
+              <li key={m.id} className="flex items-center gap-3">
+                <img
+                  src={m.poster}
+                  alt={m.title}
+                  className="w-12 h-16 object-cover rounded shadow"
+                />
+                <div>
+                  <span className="font-semibold">{m.title}</span> — ajouté {timeAgo(m.created_at)}
+                </div>
+              </li>
+            ))}
           </ul>
         </div>
       </div>
