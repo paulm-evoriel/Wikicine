@@ -46,7 +46,7 @@ export default function App() {
         />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/movies" element={<MoviesPage />} />
+        <Route path="/movies" element={<MoviesPage user={user} />} />
         <Route path="/movie/:id" element={<MovieDetailPage />} />
         <Route
           path="/tierlist"

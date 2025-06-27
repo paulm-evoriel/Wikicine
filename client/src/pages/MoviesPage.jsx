@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import AddMovie from "../components/Add_movie";
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-export default function MoviesPage() {
+export default function MoviesPage({ user }) {
   const [movies, setMovies] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,6 +12,7 @@ export default function MoviesPage() {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("title");
   const [sortDir, setSortDir] = useState("asc");
+  const [showAdd, setShowAdd] = useState(false);
 
   useEffect(() => {
     fetch(`${API_URL}/movies`)
@@ -137,6 +139,16 @@ export default function MoviesPage() {
           </Link>
         ))}
       </div>
+      <AddMovie open={showAdd} onClose={() => setShowAdd(false)} user={user} />
+      <button
+        className={`fixed bottom-8 right-8 z-50 btn btn-primary btn-lg rounded-full shadow-xl flex items-center gap-2 ${!user ? 'btn-disabled opacity-60 cursor-not-allowed' : ''}`}
+        style={{ padding: '0.9rem 1.4rem', fontSize: '1.7rem' }}
+        onClick={() => user && setShowAdd(true)}
+        aria-label="Ajouter un film"
+        disabled={!user}
+      >
+        <span className="text-2xl">＋</span>
+      </button>
     </div>
   );
 }

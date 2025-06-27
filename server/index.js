@@ -300,6 +300,81 @@ app.get("/search", async (req, res) => {
   }
 });
 
+// Autocomplete réalisateurs
+app.get('/directors', async (req, res) => {
+  const q = (req.query.q || '').trim();
+  const like = `%${q}%`;
+  try {
+    const result = await pool.query(
+      `SELECT id, first_name, last_name FROM directors WHERE first_name ILIKE $1 OR last_name ILIKE $1 ORDER BY last_name LIMIT 10`,
+      [like]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur lors de la recherche de réalisateurs' });
+  }
+});
+
+// Autocomplete acteurs
+app.get('/actors', async (req, res) => {
+  const q = (req.query.q || '').trim();
+  const like = `%${q}%`;
+  try {
+    const result = await pool.query(
+      `SELECT id, first_name, last_name FROM actors WHERE first_name ILIKE $1 OR last_name ILIKE $1 ORDER BY last_name LIMIT 10`,
+      [like]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur lors de la recherche d\'acteurs' });
+  }
+});
+
+// Autocomplete studios
+app.get('/studios', async (req, res) => {
+  const q = (req.query.q || '').trim();
+  const like = `%${q}%`;
+  try {
+    const result = await pool.query(
+      `SELECT id, name FROM studios WHERE name ILIKE $1 ORDER BY name LIMIT 10`,
+      [like]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur lors de la recherche de studios' });
+  }
+});
+
+// Autocomplete genres
+app.get('/genres', async (req, res) => {
+  const q = (req.query.q || '').trim();
+  const like = `%${q}%`;
+  try {
+    const result = await pool.query(
+      `SELECT id, name FROM genres WHERE name ILIKE $1 ORDER BY name LIMIT 10`,
+      [like]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur lors de la recherche de genres' });
+  }
+});
+
+// Autocomplete pays
+app.get('/countries', async (req, res) => {
+  const q = (req.query.q || '').trim();
+  const like = `%${q}%`;
+  try {
+    const result = await pool.query(
+      `SELECT id, name, code FROM countries WHERE name ILIKE $1 OR code ILIKE $1 ORDER BY name LIMIT 10`,
+      [like]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur lors de la recherche de pays' });
+  }
+});
+
 app.listen(5000, () => {
   console.log("Backend running on port 5000");
 });
