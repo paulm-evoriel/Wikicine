@@ -1,4 +1,4 @@
---
+﻿--
 -- PostgreSQL database dump
 --
 
@@ -1164,6 +1164,7 @@ COPY public.review_likes (user_id, review_id, is_helpful, created_at) FROM stdin
 --
 
 COPY public.reviews (id, user_id, movie_id, rating, title, content, contains_spoilers, is_recommended, watch_date, created_at, updated_at) FROM stdin;
+1	3	3	8.0	\N	Super film !	f	\N	\N	2025-06-27 09:12:09.666421	2025-06-27 09:12:09.666421
 \.
 
 
@@ -1218,6 +1219,8 @@ COPY public.user_follows (follower_id, following_id, created_at) FROM stdin;
 
 COPY public.users (id, username, email, password_hash, first_name, last_name, nationality, date_of_birth, profile_picture, bio, is_verified, is_admin, created_at, updated_at, last_login) FROM stdin;
 1	admin	admin@wikinema.com	hashed_password_placeholder	\N	\N	\N	\N	\N	\N	f	t	2025-06-25 17:07:56.847541	2025-06-25 17:07:56.847541	\N
+2	testuser	test@example.com	$2b$10$A3hKRN6cv8GygyxZAcCf9usvrrKFNTjJKyF2jrnrxp/xWD9I.ezhu	\N	\N	\N	\N	\N	\N	f	f	2025-06-26 12:33:42.258345	2025-06-26 12:33:42.258345	\N
+3	titi	titi@mail.com	$2b$10$QJVQkD6EZ5rJtH3J1KUt/.wm9J8ptoulDMeg8dNNYNsa87.DFPOF6	\N	\N	\N	\N	\N	\N	f	f	2025-06-26 12:48:52.68838	2025-06-26 12:48:52.68838	\N
 \.
 
 
@@ -1304,7 +1307,7 @@ SELECT pg_catalog.setval('public.review_comments_id_seq', 1, false);
 -- Name: reviews_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.reviews_id_seq', 1, false);
+SELECT pg_catalog.setval('public.reviews_id_seq', 3, true);
 
 
 --
@@ -1332,7 +1335,7 @@ SELECT pg_catalog.setval('public.tiers_id_seq', 1, false);
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 1, false);
+SELECT pg_catalog.setval('public.users_id_seq', 3, true);
 
 
 --
