@@ -36,6 +36,40 @@ app.get("/movies", async (req, res) => {
   }
 });
 
+// Derniers films ajoutés (10 plus récents)
+app.get("/movies/latest", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT id, title, poster, created_at
+      FROM movies
+      ORDER BY created_at DESC
+      LIMIT 10
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur lors de la récupération des derniers films" });
+  }
+});
+
+// Dernières reviews (10 plus récentes)
+app.get("/reviews/latest", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT r.id, r.rating, r.content, r.created_at, u.username, m.id as movie_id, m.title as movie_title, m.poster
+      FROM reviews r
+      JOIN users u ON r.user_id = u.id
+      JOIN movies m ON r.movie_id = m.id
+      ORDER BY r.created_at DESC
+      LIMIT 10
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur lors de la récupération des dernières reviews" });
+  }
+});
+
 // Route pour récupérer les détails d'un film par son ID
 app.get("/movies/:id", async (req, res) => {
   const { id } = req.params;
@@ -226,40 +260,6 @@ app.get("/me", authenticateToken, async (req, res) => {
     res.json({ user: result.rows[0] });
   } catch (err) {
     res.status(500).json({ error: "Erreur lors de la récupération du profil" });
-  }
-});
-
-// Dernières reviews (10 plus récentes)
-app.get("/reviews/latest", async (req, res) => {
-  try {
-    const result = await pool.query(`
-      SELECT r.id, r.rating, r.content, r.created_at, u.username, m.id as movie_id, m.title as movie_title, m.poster
-      FROM reviews r
-      JOIN users u ON r.user_id = u.id
-      JOIN movies m ON r.movie_id = m.id
-      ORDER BY r.created_at DESC
-      LIMIT 10
-    `);
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Erreur lors de la récupération des dernières reviews" });
-  }
-});
-
-// Derniers films ajoutés (10 plus récents)
-app.get("/movies/latest", async (req, res) => {
-  try {
-    const result = await pool.query(`
-      SELECT id, title, poster, created_at
-      FROM movies
-      ORDER BY created_at DESC
-      LIMIT 10
-    `);
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Erreur lors de la récupération des derniers films" });
   }
 });
 
