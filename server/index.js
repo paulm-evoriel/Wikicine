@@ -263,6 +263,43 @@ app.get("/me", authenticateToken, async (req, res) => {
   }
 });
 
+// Recherche globale multi-table
+app.get("/search", async (req, res) => {
+  const q = (req.query.q || "").trim();
+  if (!q) return res.json([]);
+  const like = `%${q}%`;
+  try {
+    const [users, movies, actors, studios] = await Promise.all([
+      pool.query(
+        `SELECT id, username as label, profile_picture as image FROM users WHERE username ILIKE $1 LIMIT 5`,
+        [like]
+      ),
+      pool.query(
+        `SELECT id, title as label, poster as image FROM movies WHERE title ILIKE $1 LIMIT 5`,
+        [like]
+      ),
+      pool.query(
+        `SELECT id, CONCAT(first_name, ' ', last_name) as label, photo as image FROM actors WHERE first_name ILIKE $1 OR last_name ILIKE $1 LIMIT 5`,
+        [like]
+      ),
+      pool.query(
+        `SELECT id, name as label, logo as image FROM studios WHERE name ILIKE $1 LIMIT 5`,
+        [like]
+      ),
+    ]);
+    const results = [
+      ...users.rows.map(r => ({ ...r, type: 'user' })),
+      ...movies.rows.map(r => ({ ...r, type: 'movie' })),
+      ...actors.rows.map(r => ({ ...r, type: 'actor' })),
+      ...studios.rows.map(r => ({ ...r, type: 'studio' })),
+    ];
+    res.json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur lors de la recherche" });
+  }
+});
+
 app.listen(5000, () => {
   console.log("Backend running on port 5000");
 });

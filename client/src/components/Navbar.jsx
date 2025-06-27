@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import logoWikicine from "../../image/wikicine.svg";
 import accountIcon from "../../image/account.svg";
@@ -9,6 +9,28 @@ import RegisterForm from "./Register";
 export default function Navbar({ theme, setTheme, user, setUser }) {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterMode, setIsRegisterMode] = useState(false);
+  const [search, setSearch] = useState("");
+  const [results, setResults] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const searchRef = useRef();
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+  useEffect(() => {
+    if (!search) {
+      setResults([]);
+      setShowDropdown(false);
+      return;
+    }
+    const controller = new AbortController();
+    fetch(`${API_URL}/search?q=${encodeURIComponent(search)}`, { signal: controller.signal })
+      .then(res => res.json())
+      .then(data => {
+        setResults(data);
+        setShowDropdown(true);
+      })
+      .catch(() => {});
+    return () => controller.abort();
+  }, [search]);
 
   const handleLoginSuccess = () => {
     setIsLoginModalOpen(false);
@@ -71,13 +93,48 @@ export default function Navbar({ theme, setTheme, user, setUser }) {
             📋 Liste
           </Link>
         </div>
-        <div className="flex items-center gap-2 ml-auto">
-          <input
-            type="text"
-            placeholder="Rechercher..."
-            className="input input-bordered w-full max-w-xs hidden lg:block"
-            style={{ minWidth: "150px" }}
-          />
+        <div className="flex items-center gap-2 ml-auto relative">
+          <div className="relative w-full max-w-xs hidden lg:block">
+            <input
+              ref={searchRef}
+              type="text"
+              placeholder="Rechercher..."
+              className="input input-bordered w-full"
+              style={{ minWidth: "150px" }}
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              onFocus={() => search && setShowDropdown(true)}
+              onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
+            />
+            {showDropdown && results.length > 0 && (
+              <div className="absolute left-0 right-0 mt-1 bg-base-100 border border-base-300 rounded-lg shadow-lg z-50 max-h-80 overflow-auto">
+                {results.map(r => (
+                  <Link
+                    key={r.type + '-' + r.id}
+                    to={
+                      r.type === 'movie' ? `/movie/${r.id}` :
+                      r.type === 'user' ? `/user/${r.id}` :
+                      r.type === 'actor' ? `/actor/${r.id}` :
+                      r.type === 'studio' ? `/studio/${r.id}` : '#'
+                    }
+                    className="flex items-center gap-3 px-4 py-2 hover:bg-base-200 transition-colors border-b last:border-b-0"
+                    onClick={() => setShowDropdown(false)}
+                  >
+                    {r.image && <img src={r.image} alt={r.label} className="w-8 h-8 rounded-full object-cover" />}
+                    <div className="flex-1">
+                      <span className="font-semibold">{r.label}</span>
+                      <span className="ml-2 text-xs px-2 py-0.5 rounded bg-base-300 text-base-content/70 font-mono">
+                        {r.type === 'movie' && 'Film'}
+                        {r.type === 'user' && 'Utilisateur'}
+                        {r.type === 'actor' && 'Acteur'}
+                        {r.type === 'studio' && 'Studio'}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
           <div className="dropdown dropdown-end lg:hidden">
             <label tabIndex={0} className="btn btn-ghost btn-circle">
               <svg
