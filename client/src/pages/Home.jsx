@@ -2,19 +2,50 @@ import MovieCard from "../components/MovieCard";
 import duneImg from "../../image/11.png";
 import mousquetairesImg from "../../image/12.png";
 import wonkaImg from "../../image/10.png";
+import { useState } from "react";
+import RegisterForm from "../components/Register";
 
-export default function Home({ theme }) {
+export default function Home({ theme, user, setUser }) {
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+
   return (
     <div className="pt-8 bg-base-100 text-base-content min-h-screen">
       <h1 className="pb-8 text-2xl font-bold text-center">Sortie cinéma</h1>
       <MovieCard />
-      <button
-        className={`btn mx-auto mt-8 block transition-none ${
-          theme === "dark" ? "btn-outline" : "btn-neutral"
-        }`}
-      >
-        Get Started
-      </button>
+      {!user && (
+        <button
+          className={`btn mx-auto mt-8 block transition-none ${
+            theme === "dark" ? "btn-outline" : "btn-neutral"
+          }`}
+          onClick={() => setIsRegisterModalOpen(true)}
+        >
+          Get Started
+        </button>
+      )}
+      {isRegisterModalOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={() => setIsRegisterModalOpen(false)}
+        >
+          <div
+            className="bg-base-100 p-6 rounded-lg shadow-xl w-full max-w-md mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-base-content">
+                Inscription
+              </h2>
+              <button
+                onClick={() => setIsRegisterModalOpen(false)}
+                className="btn btn-sm btn-circle btn-ghost"
+              >
+                ✕
+              </button>
+            </div>
+            <RegisterForm onSuccess={() => setIsRegisterModalOpen(false)} />
+          </div>
+        </div>
+      )}
       <div className="max-w-2xl mx-auto mt-8 p-4 bg-base-200 rounded-lg shadow text-center">
         <h2 className="text-xl font-semibold mb-2">
           Comment fonctionne Wikicine&nbsp;?
