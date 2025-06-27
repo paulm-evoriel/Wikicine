@@ -7,6 +7,7 @@ import MoviesPage from "./pages/MoviesPage";
 import MovieDetailPage from "./pages/MovieDetailPage";
 import Register from "./components/Register";
 import TierList from "./pages/TierList";
+import AdminMoviesVerify from "./pages/AdminMoviesVerify";
 
 export default function App() {
   const [theme, setTheme] = useState(
@@ -47,11 +48,12 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/movies" element={<MoviesPage user={user} />} />
-        <Route path="/movie/:id" element={<MovieDetailPage />} />
+        <Route path="/movie/:id" element={<MovieDetailPage user={user} setUser={setUser} />} />
         <Route
           path="/tierlist"
           element={<TierList theme={theme} setTheme={setTheme} />}
         />
+        <Route path="/admin/verify-movies" element={<AdminMoviesVerify user={user} />} />
       </Routes>
     </div>
   );

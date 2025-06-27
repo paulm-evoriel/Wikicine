@@ -252,7 +252,7 @@ function authenticateToken(req, res, next) {
 app.get("/me", authenticateToken, async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, username, email, first_name, last_name FROM users WHERE id = $1",
+      "SELECT id, username, email, first_name, last_name, is_admin, is_verified FROM users WHERE id = $1",
       [req.user.id]
     );
     if (result.rows.length === 0)
@@ -372,6 +372,51 @@ app.get('/countries', async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     res.status(500).json({ error: 'Erreur lors de la recherche de pays' });
+  }
+});
+
+// Middleware pour vérifier si l'utilisateur est admin
+function isAdmin(req, res, next) {
+  if (!req.user) return res.status(401).json({ error: 'Non authentifié' });
+  pool.query('SELECT is_admin FROM users WHERE id = $1', [req.user.id])
+    .then(result => {
+      if (result.rows[0]?.is_admin) return next();
+      return res.status(403).json({ error: 'Accès réservé aux admins' });
+    })
+    .catch(() => res.status(500).json({ error: 'Erreur serveur' }));
+}
+
+// Route admin : liste des films non vérifiés
+app.get('/admin/unverified-movies', authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM movies WHERE is_verified = false ORDER BY created_at DESC');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur lors de la récupération des films non vérifiés' });
+  }
+});
+
+// Route admin : valider un film
+app.patch('/movies/:id/verify', authenticateToken, isAdmin, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query('UPDATE movies SET is_verified = true WHERE id = $1 RETURNING *', [id]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Film non trouvé' });
+    res.json({ success: true, movie: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur lors de la validation du film' });
+  }
+});
+
+// Route admin : refuser un film (is_verified à false)
+app.patch('/movies/:id/unverify', authenticateToken, isAdmin, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query('UPDATE movies SET is_verified = false WHERE id = $1 RETURNING *', [id]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Film non trouvé' });
+    res.json({ success: true, movie: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur lors du refus du film' });
   }
 });
 

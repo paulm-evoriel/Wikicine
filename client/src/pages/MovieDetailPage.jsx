@@ -34,7 +34,7 @@ function StarRating({ value, onChange, max = 5, disabled }) {
   );
 }
 
-export default function MovieDetailPage() {
+export default function MovieDetailPage({ user, setUser }) {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -45,13 +45,15 @@ export default function MovieDetailPage() {
   const [reviewPage, setReviewPage] = useState(1);
   const [reviewTotal, setReviewTotal] = useState(0);
   const [reviewLimit] = useState(5);
-  const [user, setUser] = useState(null);
   const [userReview, setUserReview] = useState(null);
   const [reviewLoading, setReviewLoading] = useState(false);
   const [reviewError, setReviewError] = useState('');
   const [newRating, setNewRating] = useState(0);
   const [newComment, setNewComment] = useState('');
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [verifLoading, setVerifLoading] = useState(false);
+
+  const isAdmin = user?.is_admin;
 
   useEffect(() => {
     fetch(`${API_URL}/movies/${id}`)
@@ -103,13 +105,14 @@ export default function MovieDetailPage() {
   }, [id, reviewPage, reviewLimit, userReview]);
 
   useEffect(() => {
+    if (!setUser) return;
     const onStorage = () => {
       fetchMe().then(setUser);
     };
     window.addEventListener('storage', onStorage);
     fetchMe().then(setUser);
     return () => window.removeEventListener('storage', onStorage);
-  }, []);
+  }, [setUser]);
 
   useEffect(() => {
     if (!user) return;
@@ -170,6 +173,24 @@ export default function MovieDetailPage() {
       }
     } catch (err) {
       setReviewError('Erreur réseau');
+    }
+  };
+
+  const handleVerify = async (val) => {
+    setVerifLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/movies/${movie.id}/${val ? 'verify' : 'unverify'}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setMovie(data.movie);
+      }
+    } finally {
+      setVerifLoading(false);
     }
   };
 
@@ -250,6 +271,15 @@ export default function MovieDetailPage() {
             <p>
               <strong>Titre Original:</strong> {movie.original_title}
             </p>
+          </div>
+          <div className="flex items-center gap-4 mt-4">
+            <span className={`px-3 py-1 rounded-full text-white text-sm ${movie?.is_verified ? 'bg-green-600' : 'bg-red-600'}`}>{movie?.is_verified ? 'Vérifié' : 'Non vérifié'}</span>
+            {isAdmin && (
+              <>
+                <button className="btn btn-success" disabled={verifLoading || movie?.is_verified} onClick={() => handleVerify(true)}>Valider</button>
+                <button className="btn btn-error" disabled={verifLoading || !movie || !movie.is_verified} onClick={() => handleVerify(false)}>Refuser</button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -333,7 +363,7 @@ export default function MovieDetailPage() {
               <h2 className="text-2xl font-bold text-base-content">Connexion</h2>
               <button onClick={() => setShowLoginModal(false)} className="btn btn-sm btn-circle btn-ghost">✕</button>
             </div>
-            <LoginForm onSuccess={() => { setShowLoginModal(false); fetchMe().then(setUser); }} />
+            <LoginForm onSuccess={() => { setShowLoginModal(false); setUser && fetchMe().then(setUser); }} />
           </div>
         </div>
       )}
