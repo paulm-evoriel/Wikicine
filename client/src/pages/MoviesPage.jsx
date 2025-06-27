@@ -128,12 +128,10 @@ export default function MoviesPage({ user }) {
         {filtered.length === 0 && <div className="col-span-full text-center">Aucun film trouvé.</div>}
         {filtered.map(movie => (
           <Link to={`/movie/${movie.id}`} key={movie.id} className="group">
-            <div className="bg-base-200 rounded-xl shadow-lg overflow-hidden hover:scale-105 transition-transform flex flex-col h-full">
-              <img src={movie.poster} alt={movie.title} className="w-full h-64 object-cover" />
-              <div className="p-4 flex-1 flex flex-col">
-                <h2 className="font-bold text-lg font-montserrat mb-1 group-hover:text-primary transition-colors">{movie.title}</h2>
-                {movie.release_date && <div className="text-sm text-gray-500 mb-1">{movie.release_date}</div>}
-                {movie.box_office && <div className="text-sm text-gray-500">Box office : {movie.box_office.toLocaleString()} $</div>}
+            <div className="relative rounded-xl shadow-lg overflow-hidden hover:scale-105 transition-transform h-96 flex flex-col">
+              <img src={movie.poster} alt={movie.title} className="w-full h-full object-cover" />
+              <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 via-black/40 to-transparent px-4 py-3">
+                <h2 className="font-bold text-lg font-montserrat text-white drop-shadow-lg">{movie.title}</h2>
               </div>
             </div>
           </Link>

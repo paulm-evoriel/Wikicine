@@ -56,7 +56,10 @@ export default function MovieDetailPage({ user, setUser }) {
   const isAdmin = user?.is_admin;
 
   useEffect(() => {
-    fetch(`${API_URL}/movies/${id}`)
+    const headers = {};
+    const token = getToken();
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    fetch(`${API_URL}/movies/${id}`, { headers })
       .then((response) => {
         if (!response.ok) {
           throw new Error("Film non trouvé");
@@ -75,7 +78,10 @@ export default function MovieDetailPage({ user, setUser }) {
   }, [id]);
 
   useEffect(() => {
-    fetch(`${API_URL}/movies/${id}/cast`)
+    const headers = {};
+    const token = getToken();
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    fetch(`${API_URL}/movies/${id}/cast`, { headers })
       .then((response) => {
         if (!response.ok)
           throw new Error("Erreur lors du chargement du casting");

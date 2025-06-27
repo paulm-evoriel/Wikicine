@@ -23,11 +23,27 @@ app.get("/", (req, res) => {
   res.send("API is working");
 });
 
-// Route pour récupérer les films triés par box-office
+// Middleware pour vérifier si l'utilisateur est admin OU renvoyer son profil
+function getUserFromToken(req) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if (!token) return null;
+  try {
+    return jwt.verify(token, JWT_SECRET);
+  } catch {
+    return null;
+  }
+}
+
+// Route pour récupérer les films triés par box-office (public : seulement les vérifiés, admin : tous)
 app.get("/movies", async (req, res) => {
+  const user = getUserFromToken(req);
+  const isAdmin = user ? await pool.query('SELECT is_admin FROM users WHERE id = $1', [user.id]).then(r => r.rows[0]?.is_admin) : false;
   try {
     const result = await pool.query(
-      "SELECT id, title, poster, box_office FROM movies ORDER BY box_office DESC"
+      isAdmin ?
+        "SELECT id, title, poster, box_office FROM movies ORDER BY box_office DESC" :
+        "SELECT id, title, poster, box_office FROM movies WHERE is_verified = true ORDER BY box_office DESC"
     );
     res.json(result.rows);
   } catch (err) {
@@ -70,11 +86,13 @@ app.get("/reviews/latest", async (req, res) => {
   }
 });
 
-// Route pour récupérer les détails d'un film par son ID
+// Route pour récupérer les détails d'un film par son ID (public : seulement vérifié, admin : tout)
 app.get("/movies/:id", async (req, res) => {
   const { id } = req.params;
+  const user = getUserFromToken(req);
+  const isAdmin = user ? await pool.query('SELECT is_admin FROM users WHERE id = $1', [user.id]).then(r => r.rows[0]?.is_admin) : false;
   try {
-    const result = await pool.query("SELECT * FROM movies WHERE id = $1", [id]);
+    const result = await pool.query("SELECT * FROM movies WHERE id = $1" + (isAdmin ? "" : " AND is_verified = true"), [id]);
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Film non trouvé" });
     }
