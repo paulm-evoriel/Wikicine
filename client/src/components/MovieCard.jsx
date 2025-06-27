@@ -1,51 +1,71 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 
-const images = [
-  "/image/1.png",
-  "/image/2.png",
-  "/image/3.png",
-  "/image/4.jpg",
-  "/image/5.png",
-  "/image/6.png",
-  "/image/7.png",
-];
-
-export default function Carousel() {
+export default function MovieCard() {
+  const [movies, setMovies] = useState([]);
   const [index, setIndex] = useState(0);
   const timeoutRef = useRef(null);
 
   useEffect(() => {
-    timeoutRef.current = setTimeout(() => {
-      setIndex((prev) => (prev + 1) % images.length);
-    }, 7000);
-    return () => clearTimeout(timeoutRef.current);
-  }, [index]);
+    fetch("http://localhost:5000/movies")
+      .then((res) => res.json())
+      .then((data) => setMovies(data))
+      .catch((err) =>
+        console.error("Erreur lors du chargement des films:", err)
+      );
+  }, []);
 
-  // Pour afficher 3 images, centrée sur l'index courant
-  const getVisibleImages = () => {
-    const prev = (index - 1 + images.length) % images.length;
-    const next = (index + 1) % images.length;
-    return [prev, index, next];
+  useEffect(() => {
+    if (movies.length === 0) return;
+    timeoutRef.current = setTimeout(() => {
+      setIndex((prev) => (prev + 1) % movies.length);
+    }, 6000);
+    return () => clearTimeout(timeoutRef.current);
+  }, [index, movies.length]);
+
+  if (movies.length === 0) {
+    return (
+      <div className="flex justify-center items-center py-8 h-[300px] sm:h-[400px] md:h-[500px]">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
+  }
+
+  // Pour afficher 3 affiches, centrées sur l'index courant
+  const getVisibleMovies = () => {
+    if (movies.length === 0) return [];
+    const prev = (index - 1 + movies.length) % movies.length;
+    const next = (index + 1) % movies.length;
+    return [movies[prev], movies[index], movies[next]];
   };
 
-  const visible = getVisibleImages();
+  const visible = getVisibleMovies();
 
   return (
-    <div className="flex justify-center items-center gap-2 sm:gap-4 py-8">
-      {visible.map((imgIdx, i) => (
-        <img
-          key={imgIdx}
-          src={images[imgIdx]}
-          alt={`Affiche ${imgIdx + 1}`}
-          className={
-            i === 1
-              ? "w-40 h-60 sm:w-64 sm:h-96 object-cover rounded-xl shadow-2xl scale-110 z-10 transition-all duration-500"
-              : "w-28 h-44 sm:w-48 sm:h-72 object-cover rounded-xl opacity-70 scale-95 transition-all duration-500"
-          }
-          style={{
-            boxShadow: i === 1 ? "0 8px 32px rgba(0,0,0,0.3)" : undefined,
-          }}
-        />
+    <div className="flex justify-center items-center gap-2 sm:gap-4 py-4 sm:py-8 h-[220px] sm:h-[400px] md:h-[500px] w-full max-w-xs sm:max-w-md md:max-w-2xl mx-auto overflow-x-hidden overflow-y-hidden">
+      {visible.map((movie, i) => (
+        <Link
+          key={movie.id}
+          to={`/movie/${movie.id}`}
+          aria-label={`Voir la fiche de ${movie.title}`}
+        >
+          <img
+            src={movie.poster}
+            alt={`Affiche de ${movie.title}`}
+            className={
+              i === 1
+                ? "w-40 h-48 sm:w-64 sm:h-96 object-cover rounded-xl shadow-2xl scale-110 z-10 transition-all duration-500 max-h-full"
+                : "w-28 h-44 sm:w-48 sm:h-72 object-cover rounded-xl opacity-70 scale-95 transition-all duration-500 max-h-full"
+            }
+            style={{
+              boxShadow: i === 1 ? "0 8px 32px rgba(0,0,0,0.3)" : undefined,
+              objectFit: "cover",
+              userSelect: "none",
+              pointerEvents: "auto",
+            }}
+            draggable={false}
+          />
+        </Link>
       ))}
     </div>
   );
