@@ -40,6 +40,7 @@ services:
       - ./fix_sequences.sql:/docker-entrypoint-initdb.d/fix_sequences.sql:ro
       - pgdata:/var/lib/postgresql/data
 
+
 volumes:
   pgdata:
 
