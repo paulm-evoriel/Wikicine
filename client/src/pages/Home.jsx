@@ -1,5 +1,6 @@
 import MovieCard from "../components/MovieCard";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import RegisterForm from "../components/Register";
 import Aurora from "../effects/Aurora";
 import ScrollFloat from "../effects/ScrollFloat";
@@ -18,6 +19,7 @@ function timeAgo(dateString) {
 }
 
 export default function Home({ theme, user, setUser }) {
+  const navigate = useNavigate();
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [latestReviews, setLatestReviews] = useState([]);
   const [latestMovies, setLatestMovies] = useState([]);
@@ -123,7 +125,8 @@ export default function Home({ theme, user, setUser }) {
             {displayedMovies.map((m) => (
               <li
                 key={m.id}
-                className="flex items-center gap-4 bg-base-100 rounded-xl p-5 shadow"
+                className="flex items-center gap-4 bg-base-100 rounded-xl p-5 shadow cursor-pointer hover:bg-base-300 transition-colors"
+                onClick={() => navigate(`/movie/${m.id}`)}
               >
                 <img
                   src={m.poster}
