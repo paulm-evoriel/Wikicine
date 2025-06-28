@@ -49,22 +49,35 @@ export default function MovieCard() {
           to={`/movie/${movie.id}`}
           aria-label={`Voir la fiche de ${movie.title}`}
         >
-          <img
-            src={movie.poster}
-            alt={`Affiche de ${movie.title}`}
-            className={
-              i === 1
-                ? "w-40 h-48 sm:w-64 sm:h-96 object-cover rounded-xl shadow-2xl scale-110 z-10 transition-all duration-500 max-h-full"
-                : "w-28 h-44 sm:w-48 sm:h-72 object-cover rounded-xl opacity-70 scale-95 transition-all duration-500 max-h-full"
-            }
+          <div
+            className="overflow-hidden"
             style={{
-              boxShadow: i === 1 ? "0 8px 32px rgba(0,0,0,0.3)" : undefined,
-              objectFit: "cover",
-              userSelect: "none",
-              pointerEvents: "auto",
+              borderRadius: "12px",
+              WebkitBorderRadius: "12px",
+              MozBorderRadius: "12px",
             }}
-            draggable={false}
-          />
+          >
+            <img
+              src={movie.poster}
+              alt={`Affiche de ${movie.title}`}
+              className={
+                i === 1
+                  ? "w-40 h-48 sm:w-64 sm:h-96 object-cover shadow-2xl z-10 transition-all duration-500 max-h-full"
+                  : "w-28 h-44 sm:w-48 sm:h-72 object-cover opacity-70 transition-all duration-500 max-h-full"
+              }
+              style={{
+                boxShadow: i === 1 ? "0 8px 32px rgba(0,0,0,0.3)" : undefined,
+                objectFit: "cover",
+                userSelect: "none",
+                pointerEvents: "auto",
+                borderRadius: "12px",
+                transform: i === 1 ? "scale(1.1)" : "scale(0.95)",
+                WebkitBorderRadius: "12px",
+                MozBorderRadius: "12px",
+              }}
+              draggable={false}
+            />
+          </div>
         </Link>
       ))}
     </div>
