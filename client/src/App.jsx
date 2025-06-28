@@ -7,6 +7,7 @@ import MoviesPage from "./pages/MoviesPage";
 import MovieDetailPage from "./pages/MovieDetailPage";
 import Register from "./components/Register";
 import TierList from "./pages/TierList";
+import Account from "./pages/Account";
 import AdminMoviesVerify from "./pages/AdminMoviesVerify";
 
 export default function App() {
@@ -62,6 +63,10 @@ export default function App() {
               setUser={setUser}
             />
           }
+        />
+        <Route
+          path="/account"
+          element={<Account user={user} setUser={setUser} />}
         />
         <Route
           path="/admin/verify-movies"

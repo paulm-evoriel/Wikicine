@@ -472,6 +472,24 @@ app.post("/my-tierlist", authenticateToken, async (req, res) => {
   }
 });
 
+// Récupérer les avis de l'utilisateur connecté
+app.get("/my-reviews", authenticateToken, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT r.*, m.title as movie_title, m.poster, m.id as movie_id
+       FROM reviews r
+       JOIN movies m ON r.movie_id = m.id
+       WHERE r.user_id = $1
+       ORDER BY r.created_at DESC`,
+      [req.user.id]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Erreur lors de la récupération des avis:", err);
+    res.status(500).json({ error: "Erreur lors de la récupération des avis" });
+  }
+});
+
 // Recherche globale multi-table
 app.get("/search", async (req, res) => {
   const q = (req.query.q || "").trim();

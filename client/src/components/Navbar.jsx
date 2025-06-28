@@ -13,7 +13,7 @@ export default function Navbar({ theme, setTheme, user, setUser }) {
   const [results, setResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const searchRef = useRef();
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   useEffect(() => {
     if (!search) {
@@ -22,9 +22,11 @@ export default function Navbar({ theme, setTheme, user, setUser }) {
       return;
     }
     const controller = new AbortController();
-    fetch(`${API_URL}/search?q=${encodeURIComponent(search)}`, { signal: controller.signal })
-      .then(res => res.json())
-      .then(data => {
+    fetch(`${API_URL}/search?q=${encodeURIComponent(search)}`, {
+      signal: controller.signal,
+    })
+      .then((res) => res.json())
+      .then((data) => {
         setResults(data);
         setShowDropdown(true);
       })
@@ -102,32 +104,43 @@ export default function Navbar({ theme, setTheme, user, setUser }) {
               className="input input-bordered w-full"
               style={{ minWidth: "150px" }}
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={(e) => setSearch(e.target.value)}
               onFocus={() => search && setShowDropdown(true)}
               onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
             />
             {showDropdown && results.length > 0 && (
               <div className="absolute left-0 right-0 mt-1 bg-base-100 border border-base-300 rounded-lg shadow-lg z-50 max-h-80 overflow-auto">
-                {results.map(r => (
+                {results.map((r) => (
                   <Link
-                    key={r.type + '-' + r.id}
+                    key={r.type + "-" + r.id}
                     to={
-                      r.type === 'movie' ? `/movie/${r.id}` :
-                      r.type === 'user' ? `/user/${r.id}` :
-                      r.type === 'actor' ? `/actor/${r.id}` :
-                      r.type === 'studio' ? `/studio/${r.id}` : '#'
+                      r.type === "movie"
+                        ? `/movie/${r.id}`
+                        : r.type === "user"
+                        ? `/user/${r.id}`
+                        : r.type === "actor"
+                        ? `/actor/${r.id}`
+                        : r.type === "studio"
+                        ? `/studio/${r.id}`
+                        : "#"
                     }
                     className="flex items-center gap-3 px-4 py-2 hover:bg-base-200 transition-colors border-b last:border-b-0"
                     onClick={() => setShowDropdown(false)}
                   >
-                    {r.image && <img src={r.image} alt={r.label} className="w-8 h-8 rounded-full object-cover" />}
+                    {r.image && (
+                      <img
+                        src={r.image}
+                        alt={r.label}
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    )}
                     <div className="flex-1">
                       <span className="font-semibold">{r.label}</span>
                       <span className="ml-2 text-xs px-2 py-0.5 rounded bg-base-300 text-base-content/70 font-mono">
-                        {r.type === 'movie' && 'Film'}
-                        {r.type === 'user' && 'Utilisateur'}
-                        {r.type === 'actor' && 'Acteur'}
-                        {r.type === 'studio' && 'Studio'}
+                        {r.type === "movie" && "Film"}
+                        {r.type === "user" && "Utilisateur"}
+                        {r.type === "actor" && "Acteur"}
+                        {r.type === "studio" && "Studio"}
                       </span>
                     </div>
                   </Link>
@@ -195,11 +208,18 @@ export default function Navbar({ theme, setTheme, user, setUser }) {
               </button>
               <ul className="menu menu-sm dropdown-content mt-3 z-[9999] p-2 shadow bg-base-100 rounded-box w-52">
                 <li>
-                  <span>👤 {user.username}</span>
+                  <Link to="/account" className="hover:text-primary">
+                    👤 {user.username}
+                  </Link>
                 </li>
                 {user.is_admin && (
                   <li>
-                    <Link to="/admin/verify-movies" className="text-red-600 font-semibold">Modération</Link>
+                    <Link
+                      to="/admin/verify-movies"
+                      className="text-red-600 font-semibold"
+                    >
+                      Modération
+                    </Link>
                   </li>
                 )}
                 <li>
