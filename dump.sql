@@ -1227,6 +1227,9 @@ COPY public.review_likes (user_id, review_id, is_helpful, created_at) FROM stdin
 
 COPY public.reviews (id, user_id, movie_id, rating, title, content, contains_spoilers, is_recommended, watch_date, created_at, updated_at) FROM stdin;
 1	3	3	8.0	\N	Super film !	f	\N	\N	2025-06-27 09:12:09.666421	2025-06-27 09:12:09.666421
+4	4	12	10.0	\N	super film De Niro joue très bien	f	\N	\N	2025-06-28 09:21:44.759692	2025-06-28 09:21:44.759692
+5	4	8	8.0	\N	TOPPPPP	f	\N	\N	2025-06-28 15:32:08.30976	2025-06-28 15:32:08.30976
+6	4	3	4.0	\N	test	f	\N	\N	2025-06-28 16:11:47.266999	2025-06-28 16:11:47.266999
 \.
 
 
@@ -1252,6 +1255,9 @@ COPY public.studios (id, name, country_id, founded_year, logo, description, webs
 --
 
 COPY public.tier_list_movies (tier_id, movie_id, order_index) FROM stdin;
+4	3	0
+2	8	0
+1	12	0
 \.
 
 
@@ -1260,6 +1266,7 @@ COPY public.tier_list_movies (tier_id, movie_id, order_index) FROM stdin;
 --
 
 COPY public.tier_lists (id, user_id, title, description, is_public, created_at, updated_at) FROM stdin;
+1	4	Ma Tier List	Tier list personnelle	t	2025-06-28 15:38:02.038839	2025-06-28 15:38:02.038839
 \.
 
 
@@ -1268,6 +1275,11 @@ COPY public.tier_lists (id, user_id, title, description, is_public, created_at, 
 --
 
 COPY public.tiers (id, tier_list_id, name, color, order_index) FROM stdin;
+1	1	S	#FFD700	1
+2	1	A	#FF6B6B	2
+3	1	B	#4ECDC4	3
+4	1	C	#45B7D1	4
+5	1	D	#96CEB4	5
 \.
 
 
@@ -1287,6 +1299,7 @@ COPY public.users (id, username, email, password_hash, first_name, last_name, na
 2	testuser	test@example.com	$2b$10$A3hKRN6cv8GygyxZAcCf9usvrrKFNTjJKyF2jrnrxp/xWD9I.ezhu	\N	\N	\N	\N	\N	\N	f	f	2025-06-26 12:33:42.258345	2025-06-26 12:33:42.258345	\N
 3	titi	titi@mail.com	$2b$10$QJVQkD6EZ5rJtH3J1KUt/.wm9J8ptoulDMeg8dNNYNsa87.DFPOF6	\N	\N	\N	\N	\N	\N	f	f	2025-06-26 12:48:52.68838	2025-06-26 12:48:52.68838	\N
 1	admin	admin@wikinema.com	$2b$10$QJVQkD6EZ5rJtH3J1KUt/.wm9J8ptoulDMeg8dNNYNsa87.DFPOF6	\N	\N	\N	\N	\N	\N	f	t	2025-06-25 17:07:56.847541	2025-06-25 17:07:56.847541	\N
+4	paulo	paul@gmail.com	$2b$10$hfzMeszqC95f2bzxQAwbr.9qWe1moGOA9xjH1vP3GTcTITV8UPZHu	\N	\N	\N	\N	\N	\N	f	f	2025-06-28 09:20:07.035285	2025-06-28 09:20:07.035285	\N
 \.
 
 
@@ -1373,7 +1386,7 @@ SELECT pg_catalog.setval('public.review_comments_id_seq', 1, false);
 -- Name: reviews_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.reviews_id_seq', 3, true);
+SELECT pg_catalog.setval('public.reviews_id_seq', 6, true);
 
 
 --
@@ -1387,21 +1400,21 @@ SELECT pg_catalog.setval('public.studios_id_seq', 9, true);
 -- Name: tier_lists_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.tier_lists_id_seq', 1, false);
+SELECT pg_catalog.setval('public.tier_lists_id_seq', 1, true);
 
 
 --
 -- Name: tiers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.tiers_id_seq', 1, false);
+SELECT pg_catalog.setval('public.tiers_id_seq', 5, true);
 
 
 --
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 3, true);
+SELECT pg_catalog.setval('public.users_id_seq', 4, true);
 
 
 --
