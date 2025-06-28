@@ -38,12 +38,16 @@ function getUserFromToken(req) {
 // Route pour récupérer les films triés par box-office (public : seulement les vérifiés, admin : tous)
 app.get("/movies", async (req, res) => {
   const user = getUserFromToken(req);
-  const isAdmin = user ? await pool.query('SELECT is_admin FROM users WHERE id = $1', [user.id]).then(r => r.rows[0]?.is_admin) : false;
+  const isAdmin = user
+    ? await pool
+        .query("SELECT is_admin FROM users WHERE id = $1", [user.id])
+        .then((r) => r.rows[0]?.is_admin)
+    : false;
   try {
     const result = await pool.query(
-      isAdmin ?
-        "SELECT id, title, poster, box_office FROM movies ORDER BY box_office DESC" :
-        "SELECT id, title, poster, box_office FROM movies WHERE is_verified = true ORDER BY box_office DESC"
+      isAdmin
+        ? "SELECT id, title, poster, box_office FROM movies ORDER BY box_office DESC"
+        : "SELECT id, title, poster, box_office FROM movies WHERE is_verified = true ORDER BY box_office DESC"
     );
     res.json(result.rows);
   } catch (err) {
@@ -64,7 +68,9 @@ app.get("/movies/latest", async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Erreur lors de la récupération des derniers films" });
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la récupération des derniers films" });
   }
 });
 
@@ -82,7 +88,9 @@ app.get("/reviews/latest", async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Erreur lors de la récupération des dernières reviews" });
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la récupération des dernières reviews" });
   }
 });
 
@@ -90,9 +98,17 @@ app.get("/reviews/latest", async (req, res) => {
 app.get("/movies/:id", async (req, res) => {
   const { id } = req.params;
   const user = getUserFromToken(req);
-  const isAdmin = user ? await pool.query('SELECT is_admin FROM users WHERE id = $1', [user.id]).then(r => r.rows[0]?.is_admin) : false;
+  const isAdmin = user
+    ? await pool
+        .query("SELECT is_admin FROM users WHERE id = $1", [user.id])
+        .then((r) => r.rows[0]?.is_admin)
+    : false;
   try {
-    const result = await pool.query("SELECT * FROM movies WHERE id = $1" + (isAdmin ? "" : " AND is_verified = true"), [id]);
+    const result = await pool.query(
+      "SELECT * FROM movies WHERE id = $1" +
+        (isAdmin ? "" : " AND is_verified = true"),
+      [id]
+    );
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Film non trouvé" });
     }
@@ -148,17 +164,20 @@ app.get("/movies/:id/reviews", async (req, res) => {
       [id, limit, offset]
     );
     const countResult = await pool.query(
-      `SELECT COUNT(*) FROM reviews WHERE movie_id = $1`, [id]
+      `SELECT COUNT(*) FROM reviews WHERE movie_id = $1`,
+      [id]
     );
     res.json({
       reviews: reviewsResult.rows,
       total: parseInt(countResult.rows[0].count),
       page,
-      limit
+      limit,
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Erreur lors de la récupération des reviews" });
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la récupération des reviews" });
   }
 });
 
@@ -197,7 +216,9 @@ app.get("/movies/:id/rating", async (req, res) => {
     res.json(result.rows[0]);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Erreur lors de la récupération de la note moyenne" });
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la récupération de la note moyenne" });
   }
 });
 
@@ -281,6 +302,176 @@ app.get("/me", authenticateToken, async (req, res) => {
   }
 });
 
+// Récupérer les films notés par l'utilisateur connecté
+app.get("/my-reviewed-movies", authenticateToken, async (req, res) => {
+  try {
+    console.log("Recherche des films notés pour l'utilisateur:", req.user.id);
+
+    const result = await pool.query(
+      `SELECT m.id, m.title, m.poster, m.release_date, r.rating, r.created_at as review_date
+       FROM movies m
+       JOIN reviews r ON m.id = r.movie_id
+       WHERE r.user_id = $1
+       ORDER BY r.created_at DESC`,
+      [req.user.id]
+    );
+
+    console.log("Résultats trouvés:", result.rows.length);
+    console.log(
+      "Films trouvés:",
+      result.rows.map((r) => ({ id: r.id, title: r.title, rating: r.rating }))
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Erreur lors de la récupération des films notés:", err);
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la récupération des films notés" });
+  }
+});
+
+// Récupérer la tier list personnelle de l'utilisateur
+app.get("/my-tierlist", authenticateToken, async (req, res) => {
+  try {
+    // Vérifier si l'utilisateur a déjà une tier list
+    let tierListResult = await pool.query(
+      "SELECT id FROM tier_lists WHERE user_id = $1 LIMIT 1",
+      [req.user.id]
+    );
+
+    let tierListId;
+    if (tierListResult.rows.length === 0) {
+      // Créer une nouvelle tier list pour l'utilisateur
+      const newTierList = await pool.query(
+        "INSERT INTO tier_lists (user_id, title, description) VALUES ($1, $2, $3) RETURNING id",
+        [req.user.id, "Ma Tier List", "Tier list personnelle"]
+      );
+      tierListId = newTierList.rows[0].id;
+
+      // Créer les tiers par défaut (S, A, B, C, D)
+      const defaultTiers = [
+        { name: "S", color: "#FFD700", order: 1 },
+        { name: "A", color: "#FF6B6B", order: 2 },
+        { name: "B", color: "#4ECDC4", order: 3 },
+        { name: "C", color: "#45B7D1", order: 4 },
+        { name: "D", color: "#96CEB4", order: 5 },
+      ];
+
+      for (const tier of defaultTiers) {
+        await pool.query(
+          "INSERT INTO tiers (tier_list_id, name, color, order_index) VALUES ($1, $2, $3, $4)",
+          [tierListId, tier.name, tier.color, tier.order]
+        );
+      }
+    } else {
+      tierListId = tierListResult.rows[0].id;
+    }
+
+    // Récupérer la tier list complète avec les films classés
+    const result = await pool.query(
+      `SELECT 
+        t.id as tier_id,
+        t.name as tier_name,
+        t.color as tier_color,
+        tlm.movie_id,
+        tlm.order_index,
+        m.title,
+        m.poster,
+        m.id as movie_id
+       FROM tiers t
+       LEFT JOIN tier_list_movies tlm ON t.id = tlm.tier_id
+       LEFT JOIN movies m ON tlm.movie_id = m.id
+       WHERE t.tier_list_id = $1
+       ORDER BY t.order_index, tlm.order_index`,
+      [tierListId]
+    );
+
+    // Organiser les données par tier
+    const tierList = {};
+    result.rows.forEach((row) => {
+      if (!tierList[row.tier_name]) {
+        tierList[row.tier_name] = {
+          id: row.tier_id,
+          color: row.tier_color,
+          movies: [],
+        };
+      }
+      if (row.movie_id) {
+        tierList[row.tier_name].movies.push({
+          id: row.movie_id,
+          title: row.title,
+          poster: row.poster,
+        });
+      }
+    });
+
+    res.json(tierList);
+  } catch (err) {
+    console.error("Erreur lors de la récupération de la tier list:", err);
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la récupération de la tier list" });
+  }
+});
+
+// Sauvegarder la tier list personnelle de l'utilisateur
+app.post("/my-tierlist", authenticateToken, async (req, res) => {
+  try {
+    const { tierList } = req.body; // Format: { "S": { movies: [...] }, "A": { movies: [...] }, ... }
+
+    // Récupérer ou créer la tier list de l'utilisateur
+    let tierListResult = await pool.query(
+      "SELECT id FROM tier_lists WHERE user_id = $1 LIMIT 1",
+      [req.user.id]
+    );
+
+    let tierListId;
+    if (tierListResult.rows.length === 0) {
+      const newTierList = await pool.query(
+        "INSERT INTO tier_lists (user_id, title, description) VALUES ($1, $2, $3) RETURNING id",
+        [req.user.id, "Ma Tier List", "Tier list personnelle"]
+      );
+      tierListId = newTierList.rows[0].id;
+    } else {
+      tierListId = tierListResult.rows[0].id;
+    }
+
+    // Récupérer les IDs des tiers
+    const tiersResult = await pool.query(
+      "SELECT id, name FROM tiers WHERE tier_list_id = $1",
+      [tierListId]
+    );
+
+    // Vider les anciens classements
+    await pool.query(
+      "DELETE FROM tier_list_movies WHERE tier_id IN (SELECT id FROM tiers WHERE tier_list_id = $1)",
+      [tierListId]
+    );
+
+    // Insérer les nouveaux classements
+    for (const [tierName, tierData] of Object.entries(tierList)) {
+      const tier = tiersResult.rows.find((t) => t.name === tierName);
+      if (tier && tierData.movies) {
+        for (let i = 0; i < tierData.movies.length; i++) {
+          const movie = tierData.movies[i];
+          await pool.query(
+            "INSERT INTO tier_list_movies (tier_id, movie_id, order_index) VALUES ($1, $2, $3)",
+            [tier.id, movie.id, i]
+          );
+        }
+      }
+    }
+
+    res.json({ success: true, message: "Tier list sauvegardée avec succès" });
+  } catch (err) {
+    console.error("Erreur lors de la sauvegarde de la tier list:", err);
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la sauvegarde de la tier list" });
+  }
+});
+
 // Recherche globale multi-table
 app.get("/search", async (req, res) => {
   const q = (req.query.q || "").trim();
@@ -306,10 +497,10 @@ app.get("/search", async (req, res) => {
       ),
     ]);
     const results = [
-      ...users.rows.map(r => ({ ...r, type: 'user' })),
-      ...movies.rows.map(r => ({ ...r, type: 'movie' })),
-      ...actors.rows.map(r => ({ ...r, type: 'actor' })),
-      ...studios.rows.map(r => ({ ...r, type: 'studio' })),
+      ...users.rows.map((r) => ({ ...r, type: "user" })),
+      ...movies.rows.map((r) => ({ ...r, type: "movie" })),
+      ...actors.rows.map((r) => ({ ...r, type: "actor" })),
+      ...studios.rows.map((r) => ({ ...r, type: "studio" })),
     ];
     res.json(results);
   } catch (err) {
@@ -319,8 +510,8 @@ app.get("/search", async (req, res) => {
 });
 
 // Autocomplete réalisateurs
-app.get('/directors', async (req, res) => {
-  const q = (req.query.q || '').trim();
+app.get("/directors", async (req, res) => {
+  const q = (req.query.q || "").trim();
   const like = `%${q}%`;
   try {
     const result = await pool.query(
@@ -329,13 +520,15 @@ app.get('/directors', async (req, res) => {
     );
     res.json(result.rows);
   } catch (err) {
-    res.status(500).json({ error: 'Erreur lors de la recherche de réalisateurs' });
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la recherche de réalisateurs" });
   }
 });
 
 // Autocomplete acteurs
-app.get('/actors', async (req, res) => {
-  const q = (req.query.q || '').trim();
+app.get("/actors", async (req, res) => {
+  const q = (req.query.q || "").trim();
   const like = `%${q}%`;
   try {
     const result = await pool.query(
@@ -344,13 +537,13 @@ app.get('/actors', async (req, res) => {
     );
     res.json(result.rows);
   } catch (err) {
-    res.status(500).json({ error: 'Erreur lors de la recherche d\'acteurs' });
+    res.status(500).json({ error: "Erreur lors de la recherche d'acteurs" });
   }
 });
 
 // Autocomplete studios
-app.get('/studios', async (req, res) => {
-  const q = (req.query.q || '').trim();
+app.get("/studios", async (req, res) => {
+  const q = (req.query.q || "").trim();
   const like = `%${q}%`;
   try {
     const result = await pool.query(
@@ -359,13 +552,13 @@ app.get('/studios', async (req, res) => {
     );
     res.json(result.rows);
   } catch (err) {
-    res.status(500).json({ error: 'Erreur lors de la recherche de studios' });
+    res.status(500).json({ error: "Erreur lors de la recherche de studios" });
   }
 });
 
 // Autocomplete genres
-app.get('/genres', async (req, res) => {
-  const q = (req.query.q || '').trim();
+app.get("/genres", async (req, res) => {
+  const q = (req.query.q || "").trim();
   const like = `%${q}%`;
   try {
     const result = await pool.query(
@@ -374,13 +567,13 @@ app.get('/genres', async (req, res) => {
     );
     res.json(result.rows);
   } catch (err) {
-    res.status(500).json({ error: 'Erreur lors de la recherche de genres' });
+    res.status(500).json({ error: "Erreur lors de la recherche de genres" });
   }
 });
 
 // Autocomplete pays
-app.get('/countries', async (req, res) => {
-  const q = (req.query.q || '').trim();
+app.get("/countries", async (req, res) => {
+  const q = (req.query.q || "").trim();
   const like = `%${q}%`;
   try {
     const result = await pool.query(
@@ -389,54 +582,82 @@ app.get('/countries', async (req, res) => {
     );
     res.json(result.rows);
   } catch (err) {
-    res.status(500).json({ error: 'Erreur lors de la recherche de pays' });
+    res.status(500).json({ error: "Erreur lors de la recherche de pays" });
   }
 });
 
 // Middleware pour vérifier si l'utilisateur est admin
 function isAdmin(req, res, next) {
-  if (!req.user) return res.status(401).json({ error: 'Non authentifié' });
-  pool.query('SELECT is_admin FROM users WHERE id = $1', [req.user.id])
-    .then(result => {
+  if (!req.user) return res.status(401).json({ error: "Non authentifié" });
+  pool
+    .query("SELECT is_admin FROM users WHERE id = $1", [req.user.id])
+    .then((result) => {
       if (result.rows[0]?.is_admin) return next();
-      return res.status(403).json({ error: 'Accès réservé aux admins' });
+      return res.status(403).json({ error: "Accès réservé aux admins" });
     })
-    .catch(() => res.status(500).json({ error: 'Erreur serveur' }));
+    .catch(() => res.status(500).json({ error: "Erreur serveur" }));
 }
 
 // Route admin : liste des films non vérifiés
-app.get('/admin/unverified-movies', authenticateToken, isAdmin, async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM movies WHERE is_verified = false ORDER BY created_at DESC');
-    res.json(result.rows);
-  } catch (err) {
-    res.status(500).json({ error: 'Erreur lors de la récupération des films non vérifiés' });
+app.get(
+  "/admin/unverified-movies",
+  authenticateToken,
+  isAdmin,
+  async (req, res) => {
+    try {
+      const result = await pool.query(
+        "SELECT * FROM movies WHERE is_verified = false ORDER BY created_at DESC"
+      );
+      res.json(result.rows);
+    } catch (err) {
+      res.status(500).json({
+        error: "Erreur lors de la récupération des films non vérifiés",
+      });
+    }
   }
-});
+);
 
 // Route admin : valider un film
-app.patch('/movies/:id/verify', authenticateToken, isAdmin, async (req, res) => {
-  const { id } = req.params;
-  try {
-    const result = await pool.query('UPDATE movies SET is_verified = true WHERE id = $1 RETURNING *', [id]);
-    if (result.rows.length === 0) return res.status(404).json({ error: 'Film non trouvé' });
-    res.json({ success: true, movie: result.rows[0] });
-  } catch (err) {
-    res.status(500).json({ error: 'Erreur lors de la validation du film' });
+app.patch(
+  "/movies/:id/verify",
+  authenticateToken,
+  isAdmin,
+  async (req, res) => {
+    const { id } = req.params;
+    try {
+      const result = await pool.query(
+        "UPDATE movies SET is_verified = true WHERE id = $1 RETURNING *",
+        [id]
+      );
+      if (result.rows.length === 0)
+        return res.status(404).json({ error: "Film non trouvé" });
+      res.json({ success: true, movie: result.rows[0] });
+    } catch (err) {
+      res.status(500).json({ error: "Erreur lors de la validation du film" });
+    }
   }
-});
+);
 
 // Route admin : refuser un film (is_verified à false)
-app.patch('/movies/:id/unverify', authenticateToken, isAdmin, async (req, res) => {
-  const { id } = req.params;
-  try {
-    const result = await pool.query('UPDATE movies SET is_verified = false WHERE id = $1 RETURNING *', [id]);
-    if (result.rows.length === 0) return res.status(404).json({ error: 'Film non trouvé' });
-    res.json({ success: true, movie: result.rows[0] });
-  } catch (err) {
-    res.status(500).json({ error: 'Erreur lors du refus du film' });
+app.patch(
+  "/movies/:id/unverify",
+  authenticateToken,
+  isAdmin,
+  async (req, res) => {
+    const { id } = req.params;
+    try {
+      const result = await pool.query(
+        "UPDATE movies SET is_verified = false WHERE id = $1 RETURNING *",
+        [id]
+      );
+      if (result.rows.length === 0)
+        return res.status(404).json({ error: "Film non trouvé" });
+      res.json({ success: true, movie: result.rows[0] });
+    } catch (err) {
+      res.status(500).json({ error: "Erreur lors du refus du film" });
+    }
   }
-});
+);
 
 app.listen(5000, () => {
   console.log("Backend running on port 5000");

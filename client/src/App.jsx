@@ -48,12 +48,25 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/movies" element={<MoviesPage user={user} />} />
-        <Route path="/movie/:id" element={<MovieDetailPage user={user} setUser={setUser} />} />
+        <Route
+          path="/movie/:id"
+          element={<MovieDetailPage user={user} setUser={setUser} />}
+        />
         <Route
           path="/tierlist"
-          element={<TierList theme={theme} setTheme={setTheme} />}
+          element={
+            <TierList
+              theme={theme}
+              setTheme={setTheme}
+              user={user}
+              setUser={setUser}
+            />
+          }
         />
-        <Route path="/admin/verify-movies" element={<AdminMoviesVerify user={user} />} />
+        <Route
+          path="/admin/verify-movies"
+          element={<AdminMoviesVerify user={user} />}
+        />
       </Routes>
     </div>
   );
