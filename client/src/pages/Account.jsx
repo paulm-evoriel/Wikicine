@@ -281,7 +281,7 @@ export default function Account({ user, setUser }) {
                     />
                     <div className="flex-1">
                       <div className="flex items-start justify-between mb-2">
-                        <div>
+                        <div className="flex-1">
                           <h3 className="font-semibold text-lg">
                             <Link
                               to={`/movie/${review.movie_id}`}
@@ -292,27 +292,31 @@ export default function Account({ user, setUser }) {
                           </h3>
                           <div className="flex items-center gap-2 mt-1">
                             <div className="rating rating-sm">
-                              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
+                              {[1, 2, 3, 4, 5].map((star) => (
                                 <input
                                   key={star}
                                   type="radio"
                                   name={`rating-${review.id}`}
                                   className="mask mask-star-2 bg-orange-400"
-                                  checked={star <= review.rating}
+                                  checked={
+                                    star <= Math.round(review.rating / 2)
+                                  }
                                   readOnly
                                 />
                               ))}
                             </div>
                             <span className="text-sm font-semibold">
-                              {review.rating}/10
+                              {(review.rating / 2).toFixed(1)}/5
                             </span>
                           </div>
                         </div>
-                        <span className="text-sm text-base-content/70">
-                          {new Date(review.created_at).toLocaleDateString(
-                            "fr-FR"
-                          )}
-                        </span>
+                        <div className="ml-8">
+                          <span className="text-sm text-base-content/70">
+                            {new Date(review.created_at).toLocaleDateString(
+                              "fr-FR"
+                            )}
+                          </span>
+                        </div>
                       </div>
 
                       {review.title && (

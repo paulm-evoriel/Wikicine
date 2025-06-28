@@ -2,17 +2,17 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import LoginForm from "../components/Login";
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 function getToken() {
-  return localStorage.getItem('token');
+  return localStorage.getItem("token");
 }
 
 async function fetchMe() {
   const token = getToken();
   if (!token) return null;
   const res = await fetch(`${API_URL}/me`, {
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) return null;
   const data = await res.json();
@@ -25,10 +25,14 @@ function StarRating({ value, onChange, max = 5, disabled }) {
       {[...Array(max)].map((_, i) => (
         <span
           key={i}
-          className={`cursor-pointer text-2xl ${i < value ? 'text-yellow-400' : 'text-gray-400'} ${disabled ? 'pointer-events-none' : ''}`}
+          className={`cursor-pointer text-2xl ${
+            i < value ? "text-yellow-400" : "text-gray-400"
+          } ${disabled ? "pointer-events-none" : ""}`}
           onClick={() => !disabled && onChange(i + 1)}
           role="button"
-        >★</span>
+        >
+          ★
+        </span>
       ))}
     </div>
   );
@@ -40,16 +44,19 @@ export default function MovieDetailPage({ user, setUser }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cast, setCast] = useState({ directors: [], actors: [] });
-  const [ratingInfo, setRatingInfo] = useState({ average_rating: null, count: 0 });
+  const [ratingInfo, setRatingInfo] = useState({
+    average_rating: null,
+    count: 0,
+  });
   const [reviews, setReviews] = useState([]);
   const [reviewPage, setReviewPage] = useState(1);
   const [reviewTotal, setReviewTotal] = useState(0);
   const [reviewLimit] = useState(5);
   const [userReview, setUserReview] = useState(null);
   const [reviewLoading, setReviewLoading] = useState(false);
-  const [reviewError, setReviewError] = useState('');
+  const [reviewError, setReviewError] = useState("");
   const [newRating, setNewRating] = useState(0);
-  const [newComment, setNewComment] = useState('');
+  const [newComment, setNewComment] = useState("");
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [verifLoading, setVerifLoading] = useState(false);
 
@@ -95,15 +102,17 @@ export default function MovieDetailPage({ user, setUser }) {
 
   useEffect(() => {
     fetch(`${API_URL}/movies/${id}/rating`)
-      .then(res => res.json())
-      .then(data => setRatingInfo(data));
+      .then((res) => res.json())
+      .then((data) => setRatingInfo(data));
   }, [id, userReview]);
 
   useEffect(() => {
     setReviewLoading(true);
-    fetch(`${API_URL}/movies/${id}/reviews?page=${reviewPage}&limit=${reviewLimit}`)
-      .then(res => res.json())
-      .then(data => {
+    fetch(
+      `${API_URL}/movies/${id}/reviews?page=${reviewPage}&limit=${reviewLimit}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
         setReviews(data.reviews);
         setReviewTotal(data.total);
         setReviewLoading(false);
@@ -115,17 +124,17 @@ export default function MovieDetailPage({ user, setUser }) {
     const onStorage = () => {
       fetchMe().then(setUser);
     };
-    window.addEventListener('storage', onStorage);
+    window.addEventListener("storage", onStorage);
     fetchMe().then(setUser);
-    return () => window.removeEventListener('storage', onStorage);
+    return () => window.removeEventListener("storage", onStorage);
   }, [setUser]);
 
   useEffect(() => {
     if (!user) return;
     fetch(`${API_URL}/movies/${id}/reviews?page=1&limit=1000`)
-      .then(res => res.json())
-      .then(data => {
-        const found = data.reviews.find(r => r.user_id === user.id);
+      .then((res) => res.json())
+      .then((data) => {
+        const found = data.reviews.find((r) => r.user_id === user.id);
         setUserReview(found || null);
       });
   }, [user, id]);
@@ -150,47 +159,52 @@ export default function MovieDetailPage({ user, setUser }) {
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
-    setReviewError('');
+    setReviewError("");
     if (!newRating) {
       if (newComment.trim() !== "") {
-        setReviewError('Vous devez sélectionner une note pour ajouter un commentaire.');
+        setReviewError(
+          "Vous devez sélectionner une note pour ajouter un commentaire."
+        );
         return;
       } else {
-        setReviewError('La note est obligatoire');
+        setReviewError("La note est obligatoire");
         return;
       }
     }
     try {
       const res = await fetch(`${API_URL}/movies/${id}/reviews`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${getToken()}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
         },
-        body: JSON.stringify({ rating: newRating * 2, content: newComment }) // note sur 10 en base
+        body: JSON.stringify({ rating: newRating * 2, content: newComment }), // note sur 10 en base
       });
       const data = await res.json();
       if (res.ok) {
         setUserReview(data.review);
         setNewRating(0);
-        setNewComment('');
+        setNewComment("");
       } else {
         setReviewError(data.error || "Erreur lors de l'ajout de la review");
       }
     } catch (err) {
-      setReviewError('Erreur réseau');
+      setReviewError("Erreur réseau");
     }
   };
 
   const handleVerify = async (val) => {
     setVerifLoading(true);
     try {
-      const res = await fetch(`${API_URL}/movies/${movie.id}/${val ? 'verify' : 'unverify'}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+      const res = await fetch(
+        `${API_URL}/movies/${movie.id}/${val ? "verify" : "unverify"}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
-      });
+      );
       if (res.ok) {
         const data = await res.json();
         setMovie(data.movie);
@@ -227,11 +241,24 @@ export default function MovieDetailPage({ user, setUser }) {
             alt={`Affiche de ${movie.title}`}
             className="rounded-lg shadow-lg w-full h-auto mb-2"
           />
-          <div className="flex items-center gap-2 mt-2">
-            <span className="text-lg font-bold">Note moyenne :</span>
-            <StarRating value={Math.round((ratingInfo.average_rating || 0) / 2)} max={5} disabled />
-            <span className="text-md">{ratingInfo.average_rating ? (Number(ratingInfo.average_rating)/2).toFixed(2) : '—'} / 5</span>
-            <span className="text-gray-500">({ratingInfo.count || 0} avis)</span>
+          <div className="flex flex-col items-center gap-2 mt-2">
+            <span className="text-lg font-bold">Note moyenne</span>
+            <div className="flex items-center gap-2">
+              <StarRating
+                value={Math.round((ratingInfo.average_rating || 0) / 2)}
+                max={5}
+                disabled
+              />
+              <span className="text-md font-semibold">
+                {ratingInfo.average_rating
+                  ? (Number(ratingInfo.average_rating) / 2).toFixed(2)
+                  : "—"}{" "}
+                / 5
+              </span>
+            </div>
+            <span className="text-gray-500 text-sm">
+              ({ratingInfo.count || 0} avis)
+            </span>
           </div>
         </div>
         <div className="md:w-2/3">
@@ -279,11 +306,29 @@ export default function MovieDetailPage({ user, setUser }) {
             </p>
           </div>
           <div className="flex items-center gap-4 mt-4">
-            <span className={`px-3 py-1 rounded-full text-white text-sm ${movie?.is_verified ? 'bg-green-600' : 'bg-red-600'}`}>{movie?.is_verified ? 'Vérifié' : 'Non vérifié'}</span>
+            <span
+              className={`px-3 py-1 rounded-full text-white text-sm ${
+                movie?.is_verified ? "bg-green-600" : "bg-red-600"
+              }`}
+            >
+              {movie?.is_verified ? "Vérifié" : "Non vérifié"}
+            </span>
             {isAdmin && (
               <>
-                <button className="btn btn-success" disabled={verifLoading || movie?.is_verified} onClick={() => handleVerify(true)}>Valider</button>
-                <button className="btn btn-error" disabled={verifLoading || !movie || !movie.is_verified} onClick={() => handleVerify(false)}>Refuser</button>
+                <button
+                  className="btn btn-success"
+                  disabled={verifLoading || movie?.is_verified}
+                  onClick={() => handleVerify(true)}
+                >
+                  Valider
+                </button>
+                <button
+                  className="btn btn-error"
+                  disabled={verifLoading || !movie || !movie.is_verified}
+                  onClick={() => handleVerify(false)}
+                >
+                  Refuser
+                </button>
               </>
             )}
           </div>
@@ -291,26 +336,54 @@ export default function MovieDetailPage({ user, setUser }) {
       </div>
       {/* Zone de note/commentaire sur toute la largeur */}
       <div className="relative w-full max-w-4xl mx-auto mt-8">
-        <div className={(!user ? "pointer-events-none blur-sm opacity-60" : "") + " transition-all"}>
-          <form className="p-4 border rounded-lg bg-base-200 flex flex-col gap-3 w-full max-w-none" onSubmit={handleReviewSubmit}>
+        <div
+          className={
+            (!user ? "pointer-events-none blur-sm opacity-60" : "") +
+            " transition-all"
+          }
+        >
+          <form
+            className="p-4 border rounded-lg bg-base-200 flex flex-col gap-3 w-full max-w-none"
+            onSubmit={handleReviewSubmit}
+          >
             <div>
               <span className="font-bold">Votre note :</span>
-              <StarRating value={user ? newRating : 0} onChange={v => user ? setNewRating(v) : null} />
+              <StarRating
+                value={user ? newRating : 0}
+                onChange={(v) => (user ? setNewRating(v) : null)}
+              />
             </div>
             <textarea
               className="textarea textarea-bordered"
               placeholder="Votre commentaire (optionnel)"
-              value={user ? newComment : ''}
-              onChange={e => user ? setNewComment(e.target.value) : null}
+              value={user ? newComment : ""}
+              onChange={(e) => (user ? setNewComment(e.target.value) : null)}
               disabled={!user}
             />
-            <button className="btn btn-primary w-fit" type="submit" disabled={!user} onClick={e => { if (!user) { e.preventDefault(); setShowLoginModal(true); } }}>Noter</button>
-            {reviewError && user && <div className="text-red-500">{reviewError}</div>}
+            <button
+              className="btn btn-primary w-fit"
+              type="submit"
+              disabled={!user}
+              onClick={(e) => {
+                if (!user) {
+                  e.preventDefault();
+                  setShowLoginModal(true);
+                }
+              }}
+            >
+              Noter
+            </button>
+            {reviewError && user && (
+              <div className="text-red-500">{reviewError}</div>
+            )}
           </form>
         </div>
         {!user && (
           <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-            <button className="btn btn-primary" onClick={() => setShowLoginModal(true)}>
+            <button
+              className="btn btn-primary"
+              onClick={() => setShowLoginModal(true)}
+            >
               Se connecter ou s'inscrire
             </button>
           </div>
@@ -321,10 +394,18 @@ export default function MovieDetailPage({ user, setUser }) {
         <div className="max-w-4xl mx-auto mt-4 p-4 border rounded-lg bg-base-200 w-full">
           <span className="font-bold">Vous avez déjà noté ce film.</span>
           <div className="flex items-center gap-2 mt-2">
-            <StarRating value={Math.round(userReview.rating/2)} max={5} disabled />
-            <span>{userReview.rating ? (userReview.rating/2).toFixed(2) : '—'} / 5</span>
+            <StarRating
+              value={Math.round(userReview.rating / 2)}
+              max={5}
+              disabled
+            />
+            <span>
+              {userReview.rating ? (userReview.rating / 2).toFixed(2) : "—"} / 5
+            </span>
           </div>
-          {userReview.content && <div className="mt-2">"{userReview.content}"</div>}
+          {userReview.content && (
+            <div className="mt-2">"{userReview.content}"</div>
+          )}
         </div>
       )}
       {/* Liste des reviews */}
@@ -335,13 +416,22 @@ export default function MovieDetailPage({ user, setUser }) {
         ) : (
           <>
             {reviews.length === 0 && <div>Aucun avis pour ce film.</div>}
-            {reviews.map(r => (
-              <div key={r.id} className="mb-4 p-4 border rounded-lg bg-base-200">
+            {reviews.map((r) => (
+              <div
+                key={r.id}
+                className="mb-4 p-4 border rounded-lg bg-base-200"
+              >
                 <div className="flex items-center gap-2">
                   <span className="font-bold">{r.username}</span>
-                  <StarRating value={Math.round(r.rating/2)} max={5} disabled />
-                  <span>{r.rating ? (r.rating/2).toFixed(2) : '—'} / 5</span>
-                  <span className="text-gray-500 text-xs">{new Date(r.created_at).toLocaleDateString()}</span>
+                  <StarRating
+                    value={Math.round(r.rating / 2)}
+                    max={5}
+                    disabled
+                  />
+                  <span>{r.rating ? (r.rating / 2).toFixed(2) : "—"} / 5</span>
+                  <span className="text-gray-500 text-xs">
+                    {new Date(r.created_at).toLocaleDateString()}
+                  </span>
                 </div>
                 {r.content && <div className="mt-2">{r.content}</div>}
               </div>
@@ -349,13 +439,20 @@ export default function MovieDetailPage({ user, setUser }) {
             {/* Pagination */}
             {reviewTotal > reviewLimit && (
               <div className="flex gap-2 justify-center mt-4">
-                {Array.from({ length: Math.ceil(reviewTotal / reviewLimit) }, (_, i) => (
-                  <button
-                    key={i}
-                    className={`btn btn-xs ${reviewPage === i + 1 ? 'btn-primary' : ''}`}
-                    onClick={() => setReviewPage(i + 1)}
-                  >{i + 1}</button>
-                ))}
+                {Array.from(
+                  { length: Math.ceil(reviewTotal / reviewLimit) },
+                  (_, i) => (
+                    <button
+                      key={i}
+                      className={`btn btn-xs ${
+                        reviewPage === i + 1 ? "btn-primary" : ""
+                      }`}
+                      onClick={() => setReviewPage(i + 1)}
+                    >
+                      {i + 1}
+                    </button>
+                  )
+                )}
               </div>
             )}
           </>
@@ -363,13 +460,31 @@ export default function MovieDetailPage({ user, setUser }) {
       </div>
       {/* Modal de connexion */}
       {showLoginModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowLoginModal(false)}>
-          <div className="bg-base-100 p-6 rounded-lg shadow-xl w-full max-w-md mx-4" onClick={e => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={() => setShowLoginModal(false)}
+        >
+          <div
+            className="bg-base-100 p-6 rounded-lg shadow-xl w-full max-w-md mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-base-content">Connexion</h2>
-              <button onClick={() => setShowLoginModal(false)} className="btn btn-sm btn-circle btn-ghost">✕</button>
+              <h2 className="text-2xl font-bold text-base-content">
+                Connexion
+              </h2>
+              <button
+                onClick={() => setShowLoginModal(false)}
+                className="btn btn-sm btn-circle btn-ghost"
+              >
+                ✕
+              </button>
             </div>
-            <LoginForm onSuccess={() => { setShowLoginModal(false); setUser && fetchMe().then(setUser); }} />
+            <LoginForm
+              onSuccess={() => {
+                setShowLoginModal(false);
+                setUser && fetchMe().then(setUser);
+              }}
+            />
           </div>
         </div>
       )}
