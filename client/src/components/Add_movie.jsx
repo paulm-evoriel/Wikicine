@@ -141,16 +141,45 @@ export default function AddMovie({ open, onClose, user }) {
 
   // Validation à la soumission
   const isValid = !!(title && releaseDate && duration && language && country && genres.length && studios.length && directors.length && actors.length && posterFile && user);
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
     if (!isValid) {
       setError("Merci de remplir tous les champs obligatoires et d'être connecté.");
       return;
     }
     setError("");
-    // TODO: envoyer les données à l'API
-    alert("Formulaire prêt à être envoyé ! (pas encore connecté à l'API)");
-    onClose();
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("originalTitle", originalTitle);
+    formData.append("synopsis", synopsis);
+    formData.append("releaseDate", releaseDate);
+    formData.append("duration", duration);
+    formData.append("trailerUrl", trailerUrl);
+    formData.append("language", language);
+    formData.append("budget", budget);
+    formData.append("boxOffice", boxOffice);
+    formData.append("imdbId", imdbId);
+    formData.append("tmdbId", tmdbId);
+    formData.append("status", status);
+    formData.append("country", JSON.stringify(country));
+    formData.append("genres", JSON.stringify(genres));
+    formData.append("studios", JSON.stringify(studios));
+    formData.append("directors", JSON.stringify(directors));
+    formData.append("actors", JSON.stringify(actors));
+    formData.append("poster", posterFile);
+    try {
+      const token = (user && user.token) || localStorage.getItem('token');
+      const headers = token ? { 'Authorization': `Bearer ${token}` } : undefined;
+      const response = await fetch(`${API_URL}/movies`, {
+        method: "POST",
+        body: formData,
+        headers
+      });
+      if (!response.ok) throw new Error("Erreur lors de l'ajout du film");
+      onClose();
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   if (!open) return null;
@@ -295,7 +324,7 @@ export default function AddMovie({ open, onClose, user }) {
                   <option value="cameo">Cameo</option>
                   <option value="voice">Voice</option>
                 </select>
-                <input className="input input-bordered w-32" placeholder="Nom du personnage" value={actorCharInput} onChange={e => setActorCharInput(e.target.value)} />
+                <input className="input input-bordered w-full" placeholder="Nom du personnage" value={actorCharInput} onChange={e => setActorCharInput(e.target.value)} />
               </div>
               <div className="flex flex-col gap-2">
                 {actors.map((a, i) => (

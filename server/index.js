@@ -3,6 +3,9 @@ const cors = require("cors");
 const { Pool } = require("pg");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
 app.use(cors());
@@ -18,6 +21,19 @@ const pool = new Pool({
 });
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev_secret";
+
+// Configurer multer pour stocker l'image dans /client/image
+const imageDir = path.join(__dirname, '../client/image');
+if (!fs.existsSync(imageDir)) fs.mkdirSync(imageDir, { recursive: true });
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, imageDir),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const name = `${Date.now()}_${Math.round(Math.random()*1e9)}${ext}`;
+    cb(null, name);
+  }
+});
+const upload = multer({ storage });
 
 app.get("/", (req, res) => {
   res.send("API is working");
@@ -676,6 +692,81 @@ app.patch(
     }
   }
 );
+
+// Ajouter un film (authentifié)
+app.post('/movies', authenticateToken, upload.single('poster'), async (req, res) => {
+  try {
+    const {
+      title, originalTitle, synopsis, releaseDate, duration, trailerUrl, language, budget, boxOffice, imdbId, tmdbId, status
+    } = req.body;
+    const country = JSON.parse(req.body.country);
+    const genres = JSON.parse(req.body.genres);
+    const studios = JSON.parse(req.body.studios);
+    const directors = JSON.parse(req.body.directors);
+    const actors = JSON.parse(req.body.actors);
+    if (!title || !releaseDate || !duration || !language || !country || !genres.length || !studios.length || !directors.length || !actors.length || !req.file) {
+      return res.status(400).json({ error: 'Champs obligatoires manquants' });
+    }
+    // Chemin relatif pour la base
+    const posterPath = `image/${req.file.filename}`;
+    // Insérer le pays si besoin
+    let countryId = country.id;
+    if (!countryId) {
+      const cRes = await pool.query('INSERT INTO countries (name, code) VALUES ($1, $2) RETURNING id', [country.name, country.code || '']);
+      countryId = cRes.rows[0].id;
+    }
+    // Fonction pour convertir les champs numériques vides en null
+    const safeInt = v => (v === "" || v === undefined ? null : v);
+    // Insérer le film
+    const filmRes = await pool.query(
+      `INSERT INTO movies (title, original_title, synopsis, release_date, duration, poster, trailer_url, country_id, language, budget, box_office, imdb_id, tmdb_id, status, added_by_user_id)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING id`,
+      [title, originalTitle, synopsis, releaseDate, duration, posterPath, trailerUrl, countryId, language, safeInt(budget), safeInt(boxOffice), imdbId || null, safeInt(tmdbId), status, req.user.id]
+    );
+    const movieId = filmRes.rows[0].id;
+    // Genres
+    for (const g of genres) {
+      let genreId = g.id;
+      if (!genreId) {
+        const gRes = await pool.query('INSERT INTO genres (name) VALUES ($1) RETURNING id', [g.name]);
+        genreId = gRes.rows[0].id;
+      }
+      await pool.query('INSERT INTO movie_genres (movie_id, genre_id) VALUES ($1, $2) ON CONFLICT DO NOTHING', [movieId, genreId]);
+    }
+    // Studios
+    for (const s of studios) {
+      let studioId = s.studio.id;
+      if (!studioId) {
+        const sRes = await pool.query('INSERT INTO studios (name) VALUES ($1) RETURNING id', [s.studio.name]);
+        studioId = sRes.rows[0].id;
+      }
+      await pool.query('INSERT INTO movie_studios (movie_id, studio_id, role) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING', [movieId, studioId, s.role]);
+    }
+    // Réalisateurs
+    for (const d of directors) {
+      let directorId = d.director.id;
+      if (!directorId) {
+        const dRes = await pool.query('INSERT INTO directors (first_name, last_name) VALUES ($1, $2) RETURNING id', [d.director.first_name, d.director.last_name]);
+        directorId = dRes.rows[0].id;
+      }
+      await pool.query('INSERT INTO movie_directors (movie_id, director_id) VALUES ($1, $2) ON CONFLICT DO NOTHING', [movieId, directorId]);
+    }
+    // Acteurs
+    let orderIdx = 0;
+    for (const a of actors) {
+      let actorId = a.actor.id;
+      if (!actorId) {
+        const aRes = await pool.query('INSERT INTO actors (first_name, last_name) VALUES ($1, $2) RETURNING id', [a.actor.first_name, a.actor.last_name]);
+        actorId = aRes.rows[0].id;
+      }
+      await pool.query('INSERT INTO movie_actors (movie_id, actor_id, character_name, role_type, order_index) VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING', [movieId, actorId, a.character_name, a.role, orderIdx++]);
+    }
+    res.status(201).json({ success: true, movie_id: movieId });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur lors de l'ajout du film" });
+  }
+});
 
 app.listen(5000, () => {
   console.log("Backend running on port 5000");

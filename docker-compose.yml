@@ -25,6 +25,8 @@ services:
       - DB_PORT=5432
     depends_on:
       - db
+    volumes:
+      - ./client/image:/app/client/image
 
   db:
     image: postgres:15
