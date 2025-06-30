@@ -1182,20 +1182,20 @@ COPY public.movie_studios (movie_id, studio_id, role) FROM stdin;
 
 COPY public.movies (id, title, original_title, synopsis, release_date, duration, poster, trailer_url, country_id, language, budget, box_office, imdb_id, tmdb_id, status, is_verified, added_by_user_id, created_at, updated_at) FROM stdin;
 1	Barbie	Barbie	Une poupée vivant dans Barbieland est expulsée du pays pour être loin d'être assez parfaite.	2023-07-21	114	http://localhost:9000/wikicine-images/1.png	\N	1	en	145000000	1441000000	\N	\N	released	t	1	2025-06-25 17:07:57.155331	2025-06-25 17:07:57.155331
-2	Oppenheimer	Oppenheimer	L'histoire du scientifique américain J. Robert Oppenheimer et de son rôle dans le développement de la bombe atomique.	2023-07-21	180	http://localhost:9000/wikicine-images/2.png	\N	1	en	100000000	950000000	\N	\N	released	f	1	2025-06-25 17:07:57.155331	2025-06-25 17:07:57.155331
+2	Oppenheimer	Oppenheimer	L'histoire du scientifique américain J. Robert Oppenheimer et de son rôle dans le développement de la bombe atomique.	2023-07-21	180	http://localhost:9000/wikicine-images/2.png	\N	1	en	100000000	950000000	\N	\N	released	t	1	2025-06-25 17:07:57.155331	2025-06-25 17:07:57.155331
 3	Avatar: La Voie de l'eau	Avatar: The Way of Water	Jake Sully et Neytiri ont formé une famille et font tout pour rester aussi soudés que possible.	2022-12-14	192	http://localhost:9000/wikicine-images/3.png	\N	1	en	350000000	2320000000	\N	\N	released	t	1	2025-06-25 17:07:57.155331	2025-06-25 17:07:57.155331
-5	Les Évadés	The Shawshank Redemption	En 1947, Andy Dufresne, un banquier, est condamné à la prison à vie pour le meurtre de sa femme et de son amant. Ayant beau clamer son innocence, il est emprisonné à Shawshank, le pénitencier d'État du Maine. Il y fait la rencontre de Red, un contrebandier noir américain emprisonné depuis vingt ans.	1994-09-23	142	http://localhost:9000/wikicine-images/movie_5.jpg	\N	1	English	25000000	28341469	\N	278	released	f	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:20.315139
 8	Le Loup de Wall Street	The Wolf of Wall Street	L'histoire vraie de Jordan Belfort, un courtier en bourse qui passa vingt mois en prison pour avoir refusé de participer à une gigantesque arnaque, dévoilant la corruption et l'implication de la pègre qui sévit derrière les portes closes de Wall Street.	2013-12-25	180	http://localhost:9000/wikicine-images/movie_8.jpg	\N	1	English	100000000	407038432	\N	106646	released	t	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:22.744046
 7	Pulp Fiction	Pulp Fiction	L'odyssée sanglante et burlesque de petits malfrats dans la jungle de Hollywood à travers trois histoires qui s'entremêlent. Dans un restaurant, un couple de jeunes braqueurs, Pumpkin et Honey Bunny, discutent des risques que comporte leur activité.	1994-10-14	154	http://localhost:9000/wikicine-images/movie_7.jpg	\N	1	English	8000000	213928762	\N	680	released	t	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:22.250972
+5	Les Évadés	The Shawshank Redemption	En 1947, Andy Dufresne, un banquier, est condamné à la prison à vie pour le meurtre de sa femme et de son amant. Ayant beau clamer son innocence, il est emprisonné à Shawshank, le pénitencier d'État du Maine. Il y fait la rencontre de Red, un contrebandier noir américain emprisonné depuis vingt ans.	1994-09-23	142	http://localhost:9000/wikicine-images/movie_5.jpg	\N	1	English	25000000	28341469	\N	278	released	t	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:20.315139
 11	Il faut sauver le soldat Ryan	Saving Private Ryan	Lors du débarquement des forces alliées en Normandie, trois frères Ryan sont tués au combat. Leur mère, qui vient de recevoir trois télégrammes annonçant leur mort, est effondrée. Le chef d'état-major décide alors d'envoyer une escouade pour retrouver et rapatrier le dernier des frères Ryan.	1998-07-24	169	http://localhost:9000/wikicine-images/movie_11.jpg	\N	1	English	70000000	481840909	\N	857	released	t	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:21.775277
 13	Django Unchained	Django Unchained	Dans le sud des États-Unis, deux ans avant la guerre de Sécession, le Dr King Schultz, un chasseur de primes allemand, fait l'acquisition de Django, un esclave qui peut l'aider à traquer les frères Brittle, les meurtriers qu'il recherche.	2012-12-25	165	http://localhost:9000/wikicine-images/movie_13.jpg	\N	1	English	100000000	425368238	\N	68718	released	t	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:21.296866
 12	Les Affranchis	Goodfellas	Brooklyn, dans les années 1950. Depuis l'enfance, le petit Henry Hill rêve de devenir gangster. À l'âge de onze ans, il intègre la "famille" de Paul Cicero, un caïd local, et commence par travailler pour lui, effectuant ses premières livraisons.	1990-09-19	146	http://localhost:9000/wikicine-images/movie_12.jpg	\N	1	English	25000000	46800000	\N	769	released	t	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:23.71876
-4	Inception	Inception	Dom Cobb est un voleur expérimenté, le meilleur dans l'art dangereux de l'extraction : sa spécialité consiste à s'approprier les secrets les plus précieux d'un individu, enfouis au plus profond de son subconscient, pendant qu'il rêve et que son esprit est particulièrement vulnérable.	2010-07-16	148	http://localhost:9000/wikicine-images/movie_4.jpg	\N	1	English	160000000	839030630	\N	27205	released	f	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:20.810952
 6	Le Parrain	The Godfather	En 1945, à New York, les Corleone sont une des cinq familles de la mafia. Don Vito Corleone, 'parrain' de cette famille, marie sa fille à un bookmaker. Sollozzo, 'parrain' de la famille Tattaglia, propose à Don Vito une association dans le trafic de drogue, mais celui-ci refuse.	1972-03-24	175	http://localhost:9000/wikicine-images/movie_6.jpg	\N	1	English	6000000	245066411	\N	238	released	t	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:24.784247
 9	Interstellar	Interstellar	Dans un futur proche, la Terre est devenue hostile pour l'homme. Les tempêtes de sable sont fréquentes et les récoltes de plus en plus rares. Cooper, un ancien pilote de la NASA, vit avec sa famille dans une ferme. Avec sa fille Murphy, il découvre que des phénomènes étranges se produisent dans sa maison.	2014-11-07	169	http://localhost:9000/wikicine-images/movie_9.jpg	\N	1	English	165000000	746606706	\N	157336	released	t	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:23.211849
 10	Les Dents de la mer	Jaws	À quelques jours du début de la saison estivale, les habitants de la petite station balnéaire d'Amity sont mis en émoi par la découverte sur le littoral du corps atrocement mutilé d'une jeune vacancière. Pour Martin Brody, le nouveau chef de la police, il ne fait aucun doute que la jeune fille a été victime d'un requin.	1975-06-20	124	http://localhost:9000/wikicine-images/movie_10.jpg	\N	1	English	7000000	470653000	\N	578	released	t	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:24.307666
 26	testfinal			2025-06-30	12	http://localhost:9000/wikicine-images/1751297109287_b6cd96eebd7a.svg		5	FR	\N	\N	\N	\N	released	f	1	2025-06-30 15:25:09.373519	2025-06-30 15:25:09.373519
 27	bon c'était pas le dernier			2025-06-30	12	http://localhost:9000/wikicine-images/1751297312519_bd2eab891f89.png		5	FR	\N	\N	\N	\N	released	t	1	2025-06-30 15:28:32.589715	2025-06-30 15:28:32.589715
+4	Inception	Inception	Dom Cobb est un voleur expérimenté, le meilleur dans l'art dangereux de l'extraction : sa spécialité consiste à s'approprier les secrets les plus précieux d'un individu, enfouis au plus profond de son subconscient, pendant qu'il rêve et que son esprit est particulièrement vulnérable.	2010-07-16	148	http://localhost:9000/wikicine-images/movie_4.jpg	\N	1	English	160000000	839030630	\N	27205	released	t	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:20.810952
 \.
 
 
@@ -1279,6 +1279,7 @@ COPY public.tier_list_movies (tier_id, movie_id, order_index) FROM stdin;
 COPY public.tier_lists (id, user_id, title, description, is_public, created_at, updated_at) FROM stdin;
 1	4	Ma Tier List	Tier list personnelle	t	2025-06-28 15:38:02.038839	2025-06-28 15:38:02.038839
 2	1	Ma Tier List	Tier list personnelle	t	2025-06-30 08:22:03.978913	2025-06-30 08:22:03.978913
+3	3	Ma Tier List	Tier list personnelle	t	2025-06-30 20:14:51.907204	2025-06-30 20:14:51.907204
 \.
 
 
@@ -1297,6 +1298,11 @@ COPY public.tiers (id, tier_list_id, name, color, order_index) FROM stdin;
 8	2	B	#4ECDC4	3
 9	2	C	#45B7D1	4
 10	2	D	#96CEB4	5
+11	3	S	#FFD700	1
+12	3	A	#FF6B6B	2
+13	3	B	#4ECDC4	3
+14	3	C	#45B7D1	4
+15	3	D	#96CEB4	5
 \.
 
 
@@ -1314,9 +1320,9 @@ COPY public.user_follows (follower_id, following_id, created_at) FROM stdin;
 
 COPY public.users (id, username, email, password_hash, first_name, last_name, nationality, date_of_birth, profile_picture, bio, is_verified, is_admin, created_at, updated_at, last_login) FROM stdin;
 2	testuser	test@example.com	$2b$10$A3hKRN6cv8GygyxZAcCf9usvrrKFNTjJKyF2jrnrxp/xWD9I.ezhu	\N	\N	\N	\N	\N	\N	f	f	2025-06-26 12:33:42.258345	2025-06-26 12:33:42.258345	\N
-3	titi	titi@mail.com	$2b$10$QJVQkD6EZ5rJtH3J1KUt/.wm9J8ptoulDMeg8dNNYNsa87.DFPOF6	\N	\N	\N	\N	\N	\N	f	f	2025-06-26 12:48:52.68838	2025-06-26 12:48:52.68838	\N
 1	admin	admin@wikinema.com	$2b$10$QJVQkD6EZ5rJtH3J1KUt/.wm9J8ptoulDMeg8dNNYNsa87.DFPOF6	\N	\N	\N	\N	\N	\N	f	t	2025-06-25 17:07:56.847541	2025-06-25 17:07:56.847541	\N
-4	paulo	paul@gmail.com	$2b$10$hfzMeszqC95f2bzxQAwbr.9qWe1moGOA9xjH1vP3GTcTITV8UPZHu	\N	\N	\N	\N	\N	\N	f	f	2025-06-28 09:20:07.035285	2025-06-28 09:20:07.035285	\N
+3	titi	titi@mail.com	$2b$10$QJVQkD6EZ5rJtH3J1KUt/.wm9J8ptoulDMeg8dNNYNsa87.DFPOF6	\N	\N	\N	\N	\N	\N	t	f	2025-06-26 12:48:52.68838	2025-06-26 12:48:52.68838	\N
+4	paulo	paul@gmail.com	$2b$10$hfzMeszqC95f2bzxQAwbr.9qWe1moGOA9xjH1vP3GTcTITV8UPZHu	\N	\N	\N	\N	\N	\N	t	f	2025-06-28 09:20:07.035285	2025-06-28 09:20:07.035285	\N
 \.
 
 
@@ -1417,14 +1423,14 @@ SELECT pg_catalog.setval('public.studios_id_seq', 10, true);
 -- Name: tier_lists_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.tier_lists_id_seq', 2, true);
+SELECT pg_catalog.setval('public.tier_lists_id_seq', 3, true);
 
 
 --
 -- Name: tiers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.tiers_id_seq', 10, true);
+SELECT pg_catalog.setval('public.tiers_id_seq', 15, true);
 
 
 --
