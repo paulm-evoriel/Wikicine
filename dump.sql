@@ -1096,6 +1096,20 @@ COPY public.movie_actors (movie_id, actor_id, character_name, role_type, order_i
 11	6	Captain Miller	lead	\N
 11	2	Captain Miller	lead	\N
 7	5	Floyd	supporting	\N
+14	8		lead	0
+15	3		lead	0
+16	7		lead	0
+17	7		lead	0
+18	7		lead	0
+19	7		lead	0
+20	7		lead	0
+21	8		lead	0
+22	8		lead	0
+23	8		lead	0
+24	5		lead	0
+25	8		lead	0
+26	8		lead	0
+27	8		lead	0
 \.
 
 
@@ -1115,6 +1129,20 @@ COPY public.movie_directors (movie_id, director_id, role) FROM stdin;
 10	3	Director
 7	4	Director
 8	4	Director
+14	2	Director
+15	2	Director
+16	2	Director
+17	1	Director
+18	2	Director
+19	2	Director
+20	2	Director
+21	2	Director
+22	2	Director
+23	6	Director
+24	6	Director
+25	6	Director
+26	6	Director
+27	6	Director
 \.
 
 
@@ -1126,6 +1154,20 @@ COPY public.movie_genres (movie_id, genre_id) FROM stdin;
 1	4
 2	5
 3	6
+14	1
+15	1
+16	1
+17	5
+18	1
+19	1
+20	1
+21	1
+22	1
+23	1
+24	1
+25	1
+26	1
+27	1
 \.
 
 
@@ -1165,6 +1207,20 @@ COPY public.movie_studios (movie_id, studio_id, role) FROM stdin;
 9	8	production
 8	8	production
 6	8	production
+14	1	production
+15	6	production
+16	4	production
+17	10	production
+18	1	production
+19	1	production
+20	3	production
+21	6	production
+22	3	production
+23	3	production
+24	3	production
+25	3	production
+26	3	production
+27	3	production
 \.
 
 
@@ -1173,19 +1229,33 @@ COPY public.movie_studios (movie_id, studio_id, role) FROM stdin;
 --
 
 COPY public.movies (id, title, original_title, synopsis, release_date, duration, poster, trailer_url, country_id, language, budget, box_office, imdb_id, tmdb_id, status, is_verified, added_by_user_id, created_at, updated_at) FROM stdin;
-1	Barbie	Barbie	Une poupée vivant dans Barbieland est expulsée du pays pour être loin d'être assez parfaite.	2023-07-21	114	/image/1.png	\N	1	en	145000000	1441000000	\N	\N	released	f	1	2025-06-25 17:07:57.155331	2025-06-25 17:07:57.155331
-2	Oppenheimer	Oppenheimer	L'histoire du scientifique américain J. Robert Oppenheimer et de son rôle dans le développement de la bombe atomique.	2023-07-21	180	/image/2.png	\N	1	en	100000000	950000000	\N	\N	released	f	1	2025-06-25 17:07:57.155331	2025-06-25 17:07:57.155331
-9	Interstellar	Interstellar	Dans un futur proche, la Terre est devenue hostile pour l'homme. Les tempêtes de sable sont fréquentes et les récoltes de plus en plus rares. Cooper, un ancien pilote de la NASA, vit avec sa famille dans une ferme. Avec sa fille Murphy, il découvre que des phénomènes étranges se produisent dans sa maison.	2014-11-07	169	/image/movie_9.jpg	\N	1	English	165000000	746606706	\N	157336	released	f	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:23.211849
-10	Les Dents de la mer	Jaws	À quelques jours du début de la saison estivale, les habitants de la petite station balnéaire d'Amity sont mis en émoi par la découverte sur le littoral du corps atrocement mutilé d'une jeune vacancière. Pour Martin Brody, le nouveau chef de la police, il ne fait aucun doute que la jeune fille a été victime d'un requin.	1975-06-20	124	/image/movie_10.jpg	\N	1	English	7000000	470653000	\N	578	released	f	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:24.307666
-3	Avatar: La Voie de l'eau	Avatar: The Way of Water	Jake Sully et Neytiri ont formé une famille et font tout pour rester aussi soudés que possible.	2022-12-14	192	/image/3.png	\N	1	en	350000000	2320000000	\N	\N	released	t	1	2025-06-25 17:07:57.155331	2025-06-25 17:07:57.155331
-5	Les Évadés	The Shawshank Redemption	En 1947, Andy Dufresne, un banquier, est condamné à la prison à vie pour le meurtre de sa femme et de son amant. Ayant beau clamer son innocence, il est emprisonné à Shawshank, le pénitencier d'État du Maine. Il y fait la rencontre de Red, un contrebandier noir américain emprisonné depuis vingt ans.	1994-09-23	142	/image/movie_5.jpg	\N	1	English	25000000	28341469	\N	278	released	f	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:20.315139
-8	Le Loup de Wall Street	The Wolf of Wall Street	L'histoire vraie de Jordan Belfort, un courtier en bourse qui passa vingt mois en prison pour avoir refusé de participer à une gigantesque arnaque, dévoilant la corruption et l'implication de la pègre qui sévit derrière les portes closes de Wall Street.	2013-12-25	180	/image/movie_8.jpg	\N	1	English	100000000	407038432	\N	106646	released	t	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:22.744046
-7	Pulp Fiction	Pulp Fiction	L'odyssée sanglante et burlesque de petits malfrats dans la jungle de Hollywood à travers trois histoires qui s'entremêlent. Dans un restaurant, un couple de jeunes braqueurs, Pumpkin et Honey Bunny, discutent des risques que comporte leur activité.	1994-10-14	154	/image/movie_7.jpg	\N	1	English	8000000	213928762	\N	680	released	t	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:22.250972
-11	Il faut sauver le soldat Ryan	Saving Private Ryan	Lors du débarquement des forces alliées en Normandie, trois frères Ryan sont tués au combat. Leur mère, qui vient de recevoir trois télégrammes annonçant leur mort, est effondrée. Le chef d'état-major décide alors d'envoyer une escouade pour retrouver et rapatrier le dernier des frères Ryan.	1998-07-24	169	/image/movie_11.jpg	\N	1	English	70000000	481840909	\N	857	released	t	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:21.775277
-13	Django Unchained	Django Unchained	Dans le sud des États-Unis, deux ans avant la guerre de Sécession, le Dr King Schultz, un chasseur de primes allemand, fait l'acquisition de Django, un esclave qui peut l'aider à traquer les frères Brittle, les meurtriers qu'il recherche.	2012-12-25	165	/image/movie_13.jpg	\N	1	English	100000000	425368238	\N	68718	released	t	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:21.296866
-12	Les Affranchis	Goodfellas	Brooklyn, dans les années 1950. Depuis l'enfance, le petit Henry Hill rêve de devenir gangster. À l'âge de onze ans, il intègre la "famille" de Paul Cicero, un caïd local, et commence par travailler pour lui, effectuant ses premières livraisons.	1990-09-19	146	/image/movie_12.jpg	\N	1	English	25000000	46800000	\N	769	released	t	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:23.71876
-4	Inception	Inception	Dom Cobb est un voleur expérimenté, le meilleur dans l'art dangereux de l'extraction : sa spécialité consiste à s'approprier les secrets les plus précieux d'un individu, enfouis au plus profond de son subconscient, pendant qu'il rêve et que son esprit est particulièrement vulnérable.	2010-07-16	148	/image/movie_4.jpg	\N	1	English	160000000	839030630	\N	27205	released	f	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:20.810952
-6	Le Parrain	The Godfather	En 1945, à New York, les Corleone sont une des cinq familles de la mafia. Don Vito Corleone, 'parrain' de cette famille, marie sa fille à un bookmaker. Sollozzo, 'parrain' de la famille Tattaglia, propose à Don Vito une association dans le trafic de drogue, mais celui-ci refuse.	1972-03-24	175	/image/movie_6.jpg	\N	1	English	6000000	245066411	\N	238	released	t	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:24.784247
+1	Barbie	Barbie	Une poupée vivant dans Barbieland est expulsée du pays pour être loin d'être assez parfaite.	2023-07-21	114	http://localhost:9000/wikicine-images/1.png	\N	1	en	145000000	1441000000	\N	\N	released	t	1	2025-06-25 17:07:57.155331	2025-06-25 17:07:57.155331
+2	Oppenheimer	Oppenheimer	L'histoire du scientifique américain J. Robert Oppenheimer et de son rôle dans le développement de la bombe atomique.	2023-07-21	180	http://localhost:9000/wikicine-images/2.png	\N	1	en	100000000	950000000	\N	\N	released	f	1	2025-06-25 17:07:57.155331	2025-06-25 17:07:57.155331
+3	Avatar: La Voie de l'eau	Avatar: The Way of Water	Jake Sully et Neytiri ont formé une famille et font tout pour rester aussi soudés que possible.	2022-12-14	192	http://localhost:9000/wikicine-images/3.png	\N	1	en	350000000	2320000000	\N	\N	released	t	1	2025-06-25 17:07:57.155331	2025-06-25 17:07:57.155331
+5	Les Évadés	The Shawshank Redemption	En 1947, Andy Dufresne, un banquier, est condamné à la prison à vie pour le meurtre de sa femme et de son amant. Ayant beau clamer son innocence, il est emprisonné à Shawshank, le pénitencier d'État du Maine. Il y fait la rencontre de Red, un contrebandier noir américain emprisonné depuis vingt ans.	1994-09-23	142	http://localhost:9000/wikicine-images/movie_5.jpg	\N	1	English	25000000	28341469	\N	278	released	f	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:20.315139
+8	Le Loup de Wall Street	The Wolf of Wall Street	L'histoire vraie de Jordan Belfort, un courtier en bourse qui passa vingt mois en prison pour avoir refusé de participer à une gigantesque arnaque, dévoilant la corruption et l'implication de la pègre qui sévit derrière les portes closes de Wall Street.	2013-12-25	180	http://localhost:9000/wikicine-images/movie_8.jpg	\N	1	English	100000000	407038432	\N	106646	released	t	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:22.744046
+7	Pulp Fiction	Pulp Fiction	L'odyssée sanglante et burlesque de petits malfrats dans la jungle de Hollywood à travers trois histoires qui s'entremêlent. Dans un restaurant, un couple de jeunes braqueurs, Pumpkin et Honey Bunny, discutent des risques que comporte leur activité.	1994-10-14	154	http://localhost:9000/wikicine-images/movie_7.jpg	\N	1	English	8000000	213928762	\N	680	released	t	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:22.250972
+15	test2			2025-06-30	120	http://localhost:9000/wikicine-images/1751272618716_836810039.png		5	FR	\N	\N	\N	\N	released	f	1	2025-06-30 08:36:58.721654	2025-06-30 08:36:58.721654
+16	test3			2025-06-30	140	http://localhost:9000/wikicine-images/1751273316993_381780801.png		5	FR	\N	\N	\N	\N	released	f	1	2025-06-30 08:48:36.995678	2025-06-30 08:48:36.995678
+17	test4			2025-06-30	12	http://localhost:9000/wikicine-images/1751273599642_978387057.jpg		5	FR	\N	\N	\N	\N	released	f	1	2025-06-30 08:53:19.691134	2025-06-30 08:53:19.691134
+11	Il faut sauver le soldat Ryan	Saving Private Ryan	Lors du débarquement des forces alliées en Normandie, trois frères Ryan sont tués au combat. Leur mère, qui vient de recevoir trois télégrammes annonçant leur mort, est effondrée. Le chef d'état-major décide alors d'envoyer une escouade pour retrouver et rapatrier le dernier des frères Ryan.	1998-07-24	169	http://localhost:9000/wikicine-images/movie_11.jpg	\N	1	English	70000000	481840909	\N	857	released	t	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:21.775277
+13	Django Unchained	Django Unchained	Dans le sud des États-Unis, deux ans avant la guerre de Sécession, le Dr King Schultz, un chasseur de primes allemand, fait l'acquisition de Django, un esclave qui peut l'aider à traquer les frères Brittle, les meurtriers qu'il recherche.	2012-12-25	165	http://localhost:9000/wikicine-images/movie_13.jpg	\N	1	English	100000000	425368238	\N	68718	released	t	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:21.296866
+12	Les Affranchis	Goodfellas	Brooklyn, dans les années 1950. Depuis l'enfance, le petit Henry Hill rêve de devenir gangster. À l'âge de onze ans, il intègre la "famille" de Paul Cicero, un caïd local, et commence par travailler pour lui, effectuant ses premières livraisons.	1990-09-19	146	http://localhost:9000/wikicine-images/movie_12.jpg	\N	1	English	25000000	46800000	\N	769	released	t	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:23.71876
+4	Inception	Inception	Dom Cobb est un voleur expérimenté, le meilleur dans l'art dangereux de l'extraction : sa spécialité consiste à s'approprier les secrets les plus précieux d'un individu, enfouis au plus profond de son subconscient, pendant qu'il rêve et que son esprit est particulièrement vulnérable.	2010-07-16	148	http://localhost:9000/wikicine-images/movie_4.jpg	\N	1	English	160000000	839030630	\N	27205	released	f	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:20.810952
+6	Le Parrain	The Godfather	En 1945, à New York, les Corleone sont une des cinq familles de la mafia. Don Vito Corleone, 'parrain' de cette famille, marie sa fille à un bookmaker. Sollozzo, 'parrain' de la famille Tattaglia, propose à Don Vito une association dans le trafic de drogue, mais celui-ci refuse.	1972-03-24	175	http://localhost:9000/wikicine-images/movie_6.jpg	\N	1	English	6000000	245066411	\N	238	released	t	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:24.784247
+9	Interstellar	Interstellar	Dans un futur proche, la Terre est devenue hostile pour l'homme. Les tempêtes de sable sont fréquentes et les récoltes de plus en plus rares. Cooper, un ancien pilote de la NASA, vit avec sa famille dans une ferme. Avec sa fille Murphy, il découvre que des phénomènes étranges se produisent dans sa maison.	2014-11-07	169	http://localhost:9000/wikicine-images/movie_9.jpg	\N	1	English	165000000	746606706	\N	157336	released	t	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:23.211849
+14	test1			2025-06-30	120	http://localhost:9000/wikicine-images/1751272056144_620107504.png		5	FR	\N	\N	\N	\N	released	f	4	2025-06-30 08:27:36.161547	2025-06-30 08:27:36.161547
+18	test2			2025-06-30	123	http://localhost:9000/wikicine-images/1751273932849_674562267.jpg		5	FR	\N	\N	\N	\N	released	f	1	2025-06-30 08:58:52.897178	2025-06-30 08:58:52.897178
+19	test5			2025-06-30	124	http://localhost:9000/wikicine-images/1751274327381_574248623.jpg		5	FR	\N	\N	\N	\N	released	f	1	2025-06-30 09:05:27.426546	2025-06-30 09:05:27.426546
+20	test6			2025-06-30	120	http://localhost:9000/wikicine-images/1751274610623_501376263.jpg		5	FR	\N	\N	\N	\N	released	f	1	2025-06-30 09:10:10.628331	2025-06-30 09:10:10.628331
+21	test7			2025-06-30	124	http://localhost:9000/wikicine-images/1751274796043_852279218.jpg		5	FR	\N	\N	\N	\N	released	f	1	2025-06-30 09:13:16.087348	2025-06-30 09:13:16.087348
+22	test7			2025-06-30	125	http://localhost:9000/wikicine-images/1751280148664_300966349.jpg		5	FR	\N	\N	\N	\N	released	f	1	2025-06-30 10:42:28.669779	2025-06-30 10:42:28.669779
+23	test8			2025-06-30	23	http://localhost:9000/wikicine-images/1751280434344_376090618.jpg		5	FR	\N	\N	\N	\N	released	f	1	2025-06-30 10:47:14.357945	2025-06-30 10:47:14.357945
+24	test9			2025-06-30	46	http://localhost:9000/wikicine-images/1751280747119_24045044.jpg		5	FR	\N	\N	\N	\N	released	f	1	2025-06-30 10:52:27.172997	2025-06-30 10:52:27.172997
+25	test_minio2			2025-06-30	1	http://localhost:9000/wikicine-images/1751283242288_a9e2a6e86688.jpg		5	FR	\N	\N	\N	\N	released	f	1	2025-06-30 11:34:02.33588	2025-06-30 11:34:02.33588
+10	Les Dents de la mer	Jaws	À quelques jours du début de la saison estivale, les habitants de la petite station balnéaire d'Amity sont mis en émoi par la découverte sur le littoral du corps atrocement mutilé d'une jeune vacancière. Pour Martin Brody, le nouveau chef de la police, il ne fait aucun doute que la jeune fille a été victime d'un requin.	1975-06-20	124	http://localhost:9000/wikicine-images/movie_10.jpg	\N	1	English	7000000	470653000	\N	578	released	t	\N	2025-06-27 13:52:59.419577	2025-06-27 16:58:24.307666
+26	testfinal			2025-06-30	12	http://localhost:9000/wikicine-images/1751297109287_b6cd96eebd7a.svg		5	FR	\N	\N	\N	\N	released	f	1	2025-06-30 15:25:09.373519	2025-06-30 15:25:09.373519
+27	bon c'était pas le dernier			2025-06-30	12	http://localhost:9000/wikicine-images/1751297312519_bd2eab891f89.png		5	FR	\N	\N	\N	\N	released	t	1	2025-06-30 15:28:32.589715	2025-06-30 15:28:32.589715
 \.
 
 
@@ -1247,6 +1317,7 @@ COPY public.studios (id, name, country_id, founded_year, logo, description, webs
 7	Universal Pictures	1	1912	\N	\N	\N	2025-06-27 13:52:58.590192
 8	Paramount Pictures	1	1912	\N	\N	\N	2025-06-27 13:52:58.590192
 9	20th Century Studios	1	1935	\N	\N	\N	2025-06-27 13:52:58.590192
+10	Fox	\N	\N	\N	\N	\N	2025-06-30 08:53:19.704675
 \.
 
 
@@ -1267,6 +1338,7 @@ COPY public.tier_list_movies (tier_id, movie_id, order_index) FROM stdin;
 
 COPY public.tier_lists (id, user_id, title, description, is_public, created_at, updated_at) FROM stdin;
 1	4	Ma Tier List	Tier list personnelle	t	2025-06-28 15:38:02.038839	2025-06-28 15:38:02.038839
+2	1	Ma Tier List	Tier list personnelle	t	2025-06-30 08:22:03.978913	2025-06-30 08:22:03.978913
 \.
 
 
@@ -1280,6 +1352,11 @@ COPY public.tiers (id, tier_list_id, name, color, order_index) FROM stdin;
 3	1	B	#4ECDC4	3
 4	1	C	#45B7D1	4
 5	1	D	#96CEB4	5
+6	2	S	#FFD700	1
+7	2	A	#FF6B6B	2
+8	2	B	#4ECDC4	3
+9	2	C	#45B7D1	4
+10	2	D	#96CEB4	5
 \.
 
 
@@ -1358,7 +1435,7 @@ SELECT pg_catalog.setval('public.genres_id_seq', 11, true);
 -- Name: movies_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.movies_id_seq', 13, true);
+SELECT pg_catalog.setval('public.movies_id_seq', 27, true);
 
 
 --
@@ -1393,21 +1470,21 @@ SELECT pg_catalog.setval('public.reviews_id_seq', 6, true);
 -- Name: studios_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.studios_id_seq', 9, true);
+SELECT pg_catalog.setval('public.studios_id_seq', 10, true);
 
 
 --
 -- Name: tier_lists_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.tier_lists_id_seq', 1, true);
+SELECT pg_catalog.setval('public.tier_lists_id_seq', 2, true);
 
 
 --
 -- Name: tiers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.tiers_id_seq', 5, true);
+SELECT pg_catalog.setval('public.tiers_id_seq', 10, true);
 
 
 --

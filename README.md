@@ -20,6 +20,9 @@ docker cp wikicine-db-1:/tmp/dump.sql ./dump.sql
 ### Import de la base de données
 
 ```bash
+#Vider le volume
+docker-compose down -v
+
 # Démarrer les conteneurs si nécessaire
 docker-compose up -d
 
