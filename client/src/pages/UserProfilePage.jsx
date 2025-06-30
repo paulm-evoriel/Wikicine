@@ -300,6 +300,7 @@ export default function UserProfilePage({ user: currentUser }) {
                     className="bg-base-100 p-4 rounded-lg shadow-lg"
                   >
                     <div className="flex flex-col gap-4 sm:flex-row">
+                      {console.log("poster:", review.poster)}
                       <img
                         src={review.poster}
                         alt={review.movie_title}

@@ -811,7 +811,7 @@ app.get('/users/:id/reviews', async (req, res) => {
   const { id } = req.params;
   try {
     const result = await pool.query(
-      `SELECT r.*, m.title as movie_title
+      `SELECT r.*, m.poster, m.title as movie_title
        FROM reviews r
        JOIN movies m ON r.movie_id = m.id
        WHERE r.user_id = $1
