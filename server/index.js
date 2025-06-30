@@ -807,6 +807,72 @@ app.get('/users', async (req, res) => {
   }
 });
 
+app.get('/users/:id/reviews', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT r.*, m.title as movie_title
+       FROM reviews r
+       JOIN movies m ON r.movie_id = m.id
+       WHERE r.user_id = $1
+       ORDER BY r.created_at DESC`,
+      [id]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erreur lors de la récupération des reviews de l\'utilisateur' });
+  }
+});
+
+app.get('/users/:id/tierlist', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      'SELECT * FROM tier_lists WHERE user_id = $1',
+      [id]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erreur lors de la récupération de la tier list' });
+  }
+});
+
+app.get('/users/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      'SELECT id, username, email, first_name, last_name, nationality, date_of_birth, profile_picture, bio, is_verified, is_admin, created_at, updated_at, last_login FROM users WHERE id = $1',
+      [id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Utilisateur non trouvé' });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erreur lors de la récupération de l\'utilisateur' });
+  }
+});
+
+app.put('/users/:id/verify', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      'UPDATE users SET is_verified = true WHERE id = $1 RETURNING *',
+      [id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Utilisateur non trouvé' });
+    }
+    res.json({ message: 'Utilisateur vérifié', user: result.rows[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erreur lors de la vérification du compte' });
+  }
+});
+
 app.listen(5000, () => {
   console.log("Backend running on port 5000");
 });

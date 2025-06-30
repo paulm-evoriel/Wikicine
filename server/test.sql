@@ -1,1 +1,1 @@
-SELECT id, username, email, role, created_at FROM users;
+SELECT * FROM users WHERE id = 2;
