@@ -88,6 +88,66 @@ export default function Account({ user, setUser }) {
     fetchUserTierList();
   }, [user]);
 
+  const handleVerify = async () => {
+    if (!user?.is_admin || !userProfile) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:5000/users/${userProfile.id}/verify`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        setUserProfile((prevProfile) => ({
+          ...prevProfile,
+          is_verified: true,
+        }));
+        // Optionnel: afficher un message de succès
+      } else {
+        // Gérer les erreurs, afficher un message à l'utilisateur
+        console.error("Erreur lors de la vérification de l'utilisateur.");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la vérification de l'utilisateur:", error);
+    }
+  };
+
+  const handleUnverify = async () => {
+    if (!user?.is_admin || !userProfile) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:5000/users/${userProfile.id}/unverify`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        setUserProfile((prevProfile) => ({
+          ...prevProfile,
+          is_verified: false,
+        }));
+      } else {
+        console.error("Erreur lors de l'annulation de la vérification.");
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'annulation de la vérification:", error);
+    }
+  };
+
   if (!user) {
     return (
       <div className="mt-8 w-full flex flex-col gap-6 px-8 sm:px-4">
@@ -121,21 +181,27 @@ export default function Account({ user, setUser }) {
       <h1 className="text-3xl font-bold text-center mb-4">Mon Compte</h1>
 
       {/* Onglets */}
-      <div className="tabs tabs-boxed justify-center mb-6">
+      <div className="tabs tabs-boxed justify-center mb-6 flex-wrap gap-2">
         <button
-          className={`tab ${activeTab === "profile" ? "tab-active" : ""}`}
+          className={`tab min-w-[120px] whitespace-nowrap ${
+            activeTab === "profile" ? "tab-active" : ""
+          }`}
           onClick={() => setActiveTab("profile")}
         >
           👤 Profil
         </button>
         <button
-          className={`tab ${activeTab === "reviews" ? "tab-active" : ""}`}
+          className={`tab min-w-[120px] whitespace-nowrap ${
+            activeTab === "reviews" ? "tab-active" : ""
+          }`}
           onClick={() => setActiveTab("reviews")}
         >
           📝 Mes Avis ({userReviews.length})
         </button>
         <button
-          className={`tab ${activeTab === "tierlist" ? "tab-active" : ""}`}
+          className={`tab min-w-[120px] whitespace-nowrap ${
+            activeTab === "tierlist" ? "tab-active" : ""
+          }`}
           onClick={() => setActiveTab("tierlist")}
         >
           📋 Ma Tier List
@@ -157,9 +223,26 @@ export default function Account({ user, setUser }) {
                 </div>
               </div>
               <div>
-                <h3 className="text-xl font-semibold">
-                  {userProfile?.username}
-                </h3>
+                <div className="flex flex-wrap items-center gap-2 mb-2">
+                  <h3 className="text-xl font-semibold">
+                    {userProfile?.username}
+                  </h3>
+                  {userProfile &&
+                    (userProfile.is_verified ? (
+                      <span className="badge badge-success whitespace-nowrap">
+                        Vérifié
+                      </span>
+                    ) : (
+                      <span className="badge badge-error whitespace-nowrap">
+                        Non vérifié
+                      </span>
+                    ))}
+                  {userProfile?.is_admin && (
+                    <span className="badge badge-error whitespace-nowrap">
+                      👑 Administrateur
+                    </span>
+                  )}
+                </div>
                 <p className="text-base-content/70">{userProfile?.email}</p>
               </div>
             </div>
@@ -221,24 +304,8 @@ export default function Account({ user, setUser }) {
 
             <div className="divider"></div>
 
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-base-content/70">Statut du compte</p>
-                <div className="flex items-center gap-2 mt-1">
-                  {userProfile?.is_verified ? (
-                    <span className="badge badge-success">✓ Vérifié</span>
-                  ) : (
-                    <span className="badge badge-warning">
-                      ⚠ En attente de vérification
-                    </span>
-                  )}
-                  {userProfile?.is_admin && (
-                    <span className="badge badge-error">👑 Administrateur</span>
-                  )}
-                </div>
-              </div>
-
-              <div className="text-right">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="text-left">
                 <p className="text-sm text-base-content/70">Membre depuis</p>
                 <p className="text-sm">
                   {userProfile?.created_at
@@ -248,6 +315,17 @@ export default function Account({ user, setUser }) {
                     : "Date inconnue"}
                 </p>
               </div>
+
+              {user?.is_admin &&
+                (userProfile?.is_verified ? (
+                  <button onClick={handleUnverify} className="btn btn-error">
+                    Annuler la vérification
+                  </button>
+                ) : (
+                  <button onClick={handleVerify} className="btn btn-success">
+                    Vérifier le compte
+                  </button>
+                ))}
             </div>
           </div>
         </div>
@@ -273,16 +351,16 @@ export default function Account({ user, setUser }) {
                   key={review.id}
                   className="bg-base-100 p-4 rounded-lg shadow-lg"
                 >
-                  <div className="flex gap-4">
+                  <div className="flex flex-col gap-4 sm:flex-row">
                     <img
                       src={review.poster}
                       alt={review.movie_title}
-                      className="w-16 h-24 object-cover rounded"
+                      className="w-16 h-24 object-cover rounded self-center sm:self-auto"
                     />
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-lg">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-lg truncate">
                             <Link
                               to={`/movie/${review.movie_id}`}
                               className="hover:text-primary"
@@ -290,7 +368,7 @@ export default function Account({ user, setUser }) {
                               {review.movie_title}
                             </Link>
                           </h3>
-                          <div className="flex items-center gap-2 mt-1">
+                          <div className="flex flex-wrap items-center gap-2 mt-1">
                             <div className="rating rating-sm">
                               {[1, 2, 3, 4, 5].map((star) => (
                                 <input
@@ -310,7 +388,7 @@ export default function Account({ user, setUser }) {
                             </span>
                           </div>
                         </div>
-                        <div className="ml-8">
+                        <div className="ml-4 sm:ml-8">
                           <span className="text-sm text-base-content/70">
                             {new Date(review.created_at).toLocaleDateString(
                               "fr-FR"
@@ -329,12 +407,14 @@ export default function Account({ user, setUser }) {
                         </p>
                       )}
 
-                      <div className="flex gap-2 mt-3">
+                      <div className="flex flex-wrap gap-2 mt-3">
                         {review.contains_spoilers && (
-                          <span className="badge badge-warning">Spoilers</span>
+                          <span className="badge badge-warning whitespace-nowrap">
+                            Spoilers
+                          </span>
                         )}
                         {review.is_recommended && (
-                          <span className="badge badge-success">
+                          <span className="badge badge-success whitespace-nowrap">
                             Recommandé
                           </span>
                         )}
@@ -371,9 +451,9 @@ export default function Account({ user, setUser }) {
 
                   return (
                     <div key={tier} className="border rounded-lg p-4">
-                      <div className="flex items-center gap-3 mb-3">
+                      <div className="flex flex-wrap items-center gap-3 mb-3">
                         <div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${
+                          className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 ${
                             tier === "S"
                               ? "bg-yellow-400"
                               : tier === "A"
@@ -397,8 +477,10 @@ export default function Account({ user, setUser }) {
                             : tier === "C"
                             ? "Bof"
                             : "À oublier"}
-                          ({tierData.movies.length} film
-                          {tierData.movies.length > 1 ? "s" : ""})
+                          <span className="whitespace-nowrap">
+                            ({tierData.movies.length} film
+                            {tierData.movies.length > 1 ? "s" : ""})
+                          </span>
                         </h3>
                       </div>
 

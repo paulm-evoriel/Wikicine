@@ -87,7 +87,12 @@ export default function Navbar({ theme, setTheme, user, setUser }) {
           >
             🎬 Films
           </Link>
-          <button className="btn btn-sm inline-block">👥 Membre</button>
+          <Link
+            to="/members"
+            className="btn btn-sm inline-flex items-center justify-center"
+          >
+            👥 Membre
+          </Link>
           <Link
             to="/tierlist"
             className="btn btn-sm inline-flex items-center justify-center"
@@ -117,7 +122,7 @@ export default function Navbar({ theme, setTheme, user, setUser }) {
                       r.type === "movie"
                         ? `/movie/${r.id}`
                         : r.type === "user"
-                        ? `/user/${r.id}`
+                        ? `/account/${r.id}`
                         : r.type === "actor"
                         ? `/actor/${r.id}`
                         : r.type === "studio"
@@ -125,7 +130,10 @@ export default function Navbar({ theme, setTheme, user, setUser }) {
                         : "#"
                     }
                     className="flex items-center gap-3 px-4 py-2 hover:bg-base-200 transition-colors border-b last:border-b-0"
-                    onClick={() => setShowDropdown(false)}
+                    onClick={() => {
+                      setShowDropdown(false);
+                      setSearch("");
+                    }}
                   >
                     {r.image && (
                       <img
@@ -173,7 +181,7 @@ export default function Navbar({ theme, setTheme, user, setUser }) {
                 <Link to="/movies">🎬 Films</Link>
               </li>
               <li className="block sm:hidden">
-                <a>👥 Membre</a>
+                <Link to="/members">👥 Membre</Link>
               </li>
               <li className="block sm:hidden">
                 <Link to="/tierlist">📋 Liste</Link>
