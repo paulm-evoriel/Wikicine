@@ -177,12 +177,12 @@ export default function MoviesPage({ user }) {
       <AddMovie open={showAdd} onClose={() => setShowAdd(false)} user={user} />
       <button
         className={`fixed bottom-8 right-8 z-50 btn btn-primary btn-lg rounded-full shadow-xl flex items-center gap-2 ${
-          !user ? "btn-disabled opacity-60 cursor-not-allowed" : ""
+          !user || showAdd ? "btn-disabled opacity-60 cursor-not-allowed" : ""
         }`}
         style={{ padding: "0.9rem 1.4rem", fontSize: "1.7rem" }}
-        onClick={() => user && setShowAdd(true)}
+        onClick={() => user && !showAdd && setShowAdd(true)}
         aria-label="Ajouter un film"
-        disabled={!user}
+        disabled={!user || showAdd}
       >
         <span className="text-2xl">＋</span>
       </button>

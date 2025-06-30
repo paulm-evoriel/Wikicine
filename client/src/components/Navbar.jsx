@@ -130,7 +130,10 @@ export default function Navbar({ theme, setTheme, user, setUser }) {
                         : "#"
                     }
                     className="flex items-center gap-3 px-4 py-2 hover:bg-base-200 transition-colors border-b last:border-b-0"
-                    onClick={() => setShowDropdown(false)}
+                    onClick={() => {
+                      setShowDropdown(false);
+                      setSearch("");
+                    }}
                   >
                     {r.image && (
                       <img
