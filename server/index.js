@@ -6,10 +6,13 @@ const jwt = require("jsonwebtoken");
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const crypto = require('crypto');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use('/image', express.static(path.join(__dirname, '../client/image')));
 
 // Connexion à la base de données PostgreSQL
 const pool = new Pool({
@@ -22,17 +25,24 @@ const pool = new Pool({
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev_secret";
 
-// Configurer multer pour stocker l'image dans /client/image
-const imageDir = path.join(__dirname, '../client/image');
-if (!fs.existsSync(imageDir)) fs.mkdirSync(imageDir, { recursive: true });
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, imageDir),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const name = `${Date.now()}_${Math.round(Math.random()*1e9)}${ext}`;
-    cb(null, name);
-  }
+// Configuration MinIO (compatible S3)
+const MINIO_ENDPOINT = process.env.MINIO_ENDPOINT || 'http://minio:9000';
+const MINIO_ACCESS_KEY = process.env.MINIO_ROOT_USER || 'minioadmin';
+const MINIO_SECRET_KEY = process.env.MINIO_ROOT_PASSWORD || 'minioadmin';
+const MINIO_BUCKET = 'wikicine-images';
+
+const s3 = new S3Client({
+  region: 'us-east-1',
+  endpoint: MINIO_ENDPOINT,
+  credentials: {
+    accessKeyId: MINIO_ACCESS_KEY,
+    secretAccessKey: MINIO_SECRET_KEY,
+  },
+  forcePathStyle: true,
 });
+
+// Multer en mémoire (pas sur disque)
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 app.get("/", (req, res) => {
@@ -696,6 +706,23 @@ app.patch(
 // Ajouter un film (authentifié)
 app.post('/movies', authenticateToken, upload.single('poster'), async (req, res) => {
   try {
+    if (!req.file) {
+      console.error('Aucun fichier reçu pour l\'affiche !');
+      return res.status(400).json({ error: 'Aucun fichier reçu pour l\'affiche !' });
+    }
+    // Génère un nom unique pour l'image
+    const ext = req.file.originalname.split('.').pop();
+    const filename = `${Date.now()}_${crypto.randomBytes(6).toString('hex')}.${ext}`;
+    // Upload sur MinIO
+    await s3.send(new PutObjectCommand({
+      Bucket: MINIO_BUCKET,
+      Key: filename,
+      Body: req.file.buffer,
+      ContentType: req.file.mimetype,
+      ACL: 'public-read',
+    }));
+    // URL publique MinIO (port 9000 pour accès public)
+    const imageUrl = `http://localhost:9000/${MINIO_BUCKET}/${filename}`;
     const {
       title, originalTitle, synopsis, releaseDate, duration, trailerUrl, language, budget, boxOffice, imdbId, tmdbId, status
     } = req.body;
@@ -704,11 +731,12 @@ app.post('/movies', authenticateToken, upload.single('poster'), async (req, res)
     const studios = JSON.parse(req.body.studios);
     const directors = JSON.parse(req.body.directors);
     const actors = JSON.parse(req.body.actors);
-    if (!title || !releaseDate || !duration || !language || !country || !genres.length || !studios.length || !directors.length || !actors.length || !req.file) {
+    if (!title || !releaseDate || !duration || !language || !country || !genres.length || !studios.length || !directors.length || !actors.length) {
       return res.status(400).json({ error: 'Champs obligatoires manquants' });
     }
     // Chemin relatif pour la base
-    const posterPath = `image/${req.file.filename}`;
+    const posterPath = `/image/${req.file.filename}`;
+    console.log('Chemin du fichier enregistré :', posterPath);
     // Insérer le pays si besoin
     let countryId = country.id;
     if (!countryId) {
@@ -721,7 +749,7 @@ app.post('/movies', authenticateToken, upload.single('poster'), async (req, res)
     const filmRes = await pool.query(
       `INSERT INTO movies (title, original_title, synopsis, release_date, duration, poster, trailer_url, country_id, language, budget, box_office, imdb_id, tmdb_id, status, added_by_user_id)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING id`,
-      [title, originalTitle, synopsis, releaseDate, duration, posterPath, trailerUrl, countryId, language, safeInt(budget), safeInt(boxOffice), imdbId || null, safeInt(tmdbId), status, req.user.id]
+      [title, originalTitle, synopsis, releaseDate, duration, imageUrl, trailerUrl, countryId, language, safeInt(budget), safeInt(boxOffice), imdbId || null, safeInt(tmdbId), status, req.user.id]
     );
     const movieId = filmRes.rows[0].id;
     // Genres

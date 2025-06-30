@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export default function MovieCard() {
   const [movies, setMovies] = useState([]);
@@ -58,7 +59,7 @@ export default function MovieCard() {
             }}
           >
             <img
-              src={movie.poster}
+              src={`${API_URL}${movie.poster}`}
               alt={`Affiche de ${movie.title}`}
               className={
                 i === 1

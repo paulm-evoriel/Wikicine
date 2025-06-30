@@ -29,8 +29,11 @@ export default function AdminMoviesVerify({ user }) {
       {movies.length === 0 ? <div>Aucun film à valider.</div> : (
         <ul className="space-y-4">
           {movies.map(m => (
-            <li key={m.id} className="bg-base-200 rounded-lg p-4 flex items-center gap-4">
-              <img src={m.poster} alt={m.title} className="w-16 h-24 object-cover rounded shadow" />
+            <li key={m.id} className="bg-base-200 rounded-lg p-4 flex items-center gap-6">
+              <div className="flex-shrink-0 flex flex-col items-center">
+                <img src={m.poster} alt={m.title} className="w-28 h-40 object-cover rounded shadow mb-2 border-2 border-base-300" />
+                <span className="text-xs text-gray-500 mt-1">ID: {m.id}</span>
+              </div>
               <div className="flex-1">
                 <Link to={`/movie/${m.id}`} className="text-lg font-semibold hover:underline">{m.title}</Link>
                 <div className="text-sm text-gray-500">Ajouté le {new Date(m.created_at).toLocaleDateString()}</div>

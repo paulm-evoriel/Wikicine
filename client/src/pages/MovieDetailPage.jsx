@@ -250,10 +250,9 @@ export default function MovieDetailPage({ user, setUser }) {
                 disabled
               />
               <span className="text-md font-semibold">
-                {ratingInfo.average_rating
+                {typeof ratingInfo.average_rating === 'number' && !isNaN(ratingInfo.average_rating)
                   ? (Number(ratingInfo.average_rating) / 2).toFixed(2)
-                  : "—"}{" "}
-                / 5
+                  : "—"} / 5
               </span>
             </div>
             <span className="text-gray-500 text-sm">
