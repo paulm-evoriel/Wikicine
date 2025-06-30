@@ -1,68 +1,39 @@
-# Wikicine
+# Automatisation Windows (scripts .bat)
 
-Wikicine is a film rating site
+Pour automatiser le démarrage, la sauvegarde et la synchronisation de la base de données et des images MinIO avec Docker sur Windows, utilise les scripts batch fournis :
 
-## Base de données
+- **up.bat** : démarre les conteneurs, importe les images MinIO et la base de données
+- **down.bat** : exporte la base de données, exporte les images MinIO et arrête les conteneurs
 
-### Export de la base de données
+## Utilisation
 
-```bash
-# Démarrer les conteneurs si nécessaire
-docker-compose up -d
+Dans le terminal de l'ide `.\up.bat`
 
-# Créer le dump dans le conteneur
-docker exec wikicine-db-1 pg_dump -U postgres -d filmdb -f /tmp/dump.sql
+1. **Ouvre l’invite de commandes (CMD)**
+   - Appuie sur `Win + R`, tape `cmd`, puis Entrée
+   - Ou cherche "Invite de commandes" dans le menu Démarrer
 
-# Copier le dump vers votre machine locale
-docker cp wikicine-db-1:/tmp/dump.sql ./dump.sql
-```
+2. **Va dans le dossier du projet**
+   ```sh
+   cd "C:\Users\tytou\Documents\ESIEA\Semestre 2 3A\UNIZA\Git\Wikicine"
+   ```
 
-### Import de la base de données
+3. **Démarrer et importer (tout restaurer)**
+   ```sh
+   up.bat
+   ```
 
-```bash
-#Vider le volume
-docker-compose down -v
+4. **Sauvegarder et arrêter (tout exporter)**
+   ```sh
+   down.bat
+   ```
 
-# Démarrer les conteneurs si nécessaire
-docker-compose up -d
+## Remarques
+- Les scripts utilisent les commandes Docker, donc Docker Desktop doit être lancé.
+- Adapte les noms de conteneurs dans les scripts si besoin (`wikicine-minio-1`, `wikicine-db-1`).
+- Les scripts `import_db.bat` et `export_db.bat` sont appelés automatiquement.
+- Tu peux aussi double-cliquer sur les fichiers `.bat` dans l'explorateur Windows pour les exécuter.
 
-# Copier le dump vers le conteneur
-docker cp dump.sql wikicine-db-1:/tmp/dump.sql
+---
 
-# Importer le dump dans la base de données
-docker exec -it wikicine-db-1 psql -U postgres -d filmdb -f /tmp/dump.sql
-```
-
-# Synchroniser les images MinIO entre deux machines (procédure simplifiée)
-
-1. **Sur la machine source (où les images sont présentes)**
-   - Trouver le nom du conteneur MinIO :
-     ```sh
-     docker ps
-     ```
-   - Exporter les images :
-     ```sh
-     docker cp wikicine-minio-1:/data/wikicine-images ./wikicine-images-backup
-     ```
-
-2. **Transférer le dossier `wikicine-images-backup`** à la machine cible (clé USB, réseau, etc.)
-
-3. **Sur la machine cible**
-   - Trouver le nom du conteneur MinIO :
-     ```sh
-     docker ps
-     ```
-   - Créer le dossier dans le conteneur (si besoin) :
-     ```sh
-     docker exec wikicine-minio-1 mkdir -p /data/wikicine-images
-     ```
-   - Importer les images :
-     ```sh
-     docker cp ./wikicine-images-backup/. wikicine-minio-1:/data/wikicine-images
-     ```
-
-4. **Vérifier dans MinIO (http://localhost:9001)** que les images sont bien présentes.
-
-5. **Rendre le bucket public** si besoin (via l'interface MinIO ou avec `mc`).
-
-C'est tout ! Les images seront alors visibles sur toutes les pages de l'application.
+Pour toute l'équipe : il suffit de lancer `up.bat` pour tout démarrer, et `down.bat` pour tout sauvegarder et arrêter, sans installer d'outil supplémentaire !
