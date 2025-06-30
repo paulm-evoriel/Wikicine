@@ -9,6 +9,8 @@ import Register from "./components/Register";
 import TierList from "./pages/TierList";
 import Account from "./pages/Account";
 import AdminMoviesVerify from "./pages/AdminMoviesVerify";
+import MembersPage from "./pages/MembersPage";
+import UserProfilePage from "./pages/UserProfilePage";
 
 export default function App() {
   const [theme, setTheme] = useState(
@@ -71,6 +73,11 @@ export default function App() {
         <Route
           path="/admin/verify-movies"
           element={<AdminMoviesVerify user={user} />}
+        />
+        <Route path="/members" element={<MembersPage user={user} />} />
+        <Route
+          path="/account/:userId"
+          element={<UserProfilePage user={user} />}
         />
       </Routes>
     </div>

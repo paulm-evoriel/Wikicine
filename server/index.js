@@ -3,9 +3,9 @@ const cors = require("cors");
 const { Pool } = require("pg");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 
 const app = express();
 app.use(cors());
@@ -23,15 +23,15 @@ const pool = new Pool({
 const JWT_SECRET = process.env.JWT_SECRET || "dev_secret";
 
 // Configurer multer pour stocker l'image dans /client/image
-const imageDir = path.join(__dirname, '../client/image');
+const imageDir = path.join(__dirname, "../client/image");
 if (!fs.existsSync(imageDir)) fs.mkdirSync(imageDir, { recursive: true });
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, imageDir),
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
-    const name = `${Date.now()}_${Math.round(Math.random()*1e9)}${ext}`;
+    const name = `${Date.now()}_${Math.round(Math.random() * 1e9)}${ext}`;
     cb(null, name);
-  }
+  },
 });
 const upload = multer({ storage });
 
@@ -694,77 +694,366 @@ app.patch(
 );
 
 // Ajouter un film (authentifié)
-app.post('/movies', authenticateToken, upload.single('poster'), async (req, res) => {
-  try {
-    const {
-      title, originalTitle, synopsis, releaseDate, duration, trailerUrl, language, budget, boxOffice, imdbId, tmdbId, status
-    } = req.body;
-    const country = JSON.parse(req.body.country);
-    const genres = JSON.parse(req.body.genres);
-    const studios = JSON.parse(req.body.studios);
-    const directors = JSON.parse(req.body.directors);
-    const actors = JSON.parse(req.body.actors);
-    if (!title || !releaseDate || !duration || !language || !country || !genres.length || !studios.length || !directors.length || !actors.length || !req.file) {
-      return res.status(400).json({ error: 'Champs obligatoires manquants' });
-    }
-    // Chemin relatif pour la base
-    const posterPath = `image/${req.file.filename}`;
-    // Insérer le pays si besoin
-    let countryId = country.id;
-    if (!countryId) {
-      const cRes = await pool.query('INSERT INTO countries (name, code) VALUES ($1, $2) RETURNING id', [country.name, country.code || '']);
-      countryId = cRes.rows[0].id;
-    }
-    // Fonction pour convertir les champs numériques vides en null
-    const safeInt = v => (v === "" || v === undefined ? null : v);
-    // Insérer le film
-    const filmRes = await pool.query(
-      `INSERT INTO movies (title, original_title, synopsis, release_date, duration, poster, trailer_url, country_id, language, budget, box_office, imdb_id, tmdb_id, status, added_by_user_id)
+app.post(
+  "/movies",
+  authenticateToken,
+  upload.single("poster"),
+  async (req, res) => {
+    try {
+      const {
+        title,
+        originalTitle,
+        synopsis,
+        releaseDate,
+        duration,
+        trailerUrl,
+        language,
+        budget,
+        boxOffice,
+        imdbId,
+        tmdbId,
+        status,
+      } = req.body;
+      const country = JSON.parse(req.body.country);
+      const genres = JSON.parse(req.body.genres);
+      const studios = JSON.parse(req.body.studios);
+      const directors = JSON.parse(req.body.directors);
+      const actors = JSON.parse(req.body.actors);
+      if (
+        !title ||
+        !releaseDate ||
+        !duration ||
+        !language ||
+        !country ||
+        !genres.length ||
+        !studios.length ||
+        !directors.length ||
+        !actors.length ||
+        !req.file
+      ) {
+        return res.status(400).json({ error: "Champs obligatoires manquants" });
+      }
+      // Chemin relatif pour la base
+      const posterPath = `image/${req.file.filename}`;
+      // Insérer le pays si besoin
+      let countryId = country.id;
+      if (!countryId) {
+        const cRes = await pool.query(
+          "INSERT INTO countries (name, code) VALUES ($1, $2) RETURNING id",
+          [country.name, country.code || ""]
+        );
+        countryId = cRes.rows[0].id;
+      }
+      // Fonction pour convertir les champs numériques vides en null
+      const safeInt = (v) => (v === "" || v === undefined ? null : v);
+      // Insérer le film
+      const filmRes = await pool.query(
+        `INSERT INTO movies (title, original_title, synopsis, release_date, duration, poster, trailer_url, country_id, language, budget, box_office, imdb_id, tmdb_id, status, added_by_user_id)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING id`,
-      [title, originalTitle, synopsis, releaseDate, duration, posterPath, trailerUrl, countryId, language, safeInt(budget), safeInt(boxOffice), imdbId || null, safeInt(tmdbId), status, req.user.id]
+        [
+          title,
+          originalTitle,
+          synopsis,
+          releaseDate,
+          duration,
+          posterPath,
+          trailerUrl,
+          countryId,
+          language,
+          safeInt(budget),
+          safeInt(boxOffice),
+          imdbId || null,
+          safeInt(tmdbId),
+          status,
+          req.user.id,
+        ]
+      );
+      const movieId = filmRes.rows[0].id;
+      // Genres
+      for (const g of genres) {
+        let genreId = g.id;
+        if (!genreId) {
+          const gRes = await pool.query(
+            "INSERT INTO genres (name) VALUES ($1) RETURNING id",
+            [g.name]
+          );
+          genreId = gRes.rows[0].id;
+        }
+        await pool.query(
+          "INSERT INTO movie_genres (movie_id, genre_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+          [movieId, genreId]
+        );
+      }
+      // Studios
+      for (const s of studios) {
+        let studioId = s.studio.id;
+        if (!studioId) {
+          const sRes = await pool.query(
+            "INSERT INTO studios (name) VALUES ($1) RETURNING id",
+            [s.studio.name]
+          );
+          studioId = sRes.rows[0].id;
+        }
+        await pool.query(
+          "INSERT INTO movie_studios (movie_id, studio_id, role) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING",
+          [movieId, studioId, s.role]
+        );
+      }
+      // Réalisateurs
+      for (const d of directors) {
+        let directorId = d.director.id;
+        if (!directorId) {
+          const dRes = await pool.query(
+            "INSERT INTO directors (first_name, last_name) VALUES ($1, $2) RETURNING id",
+            [d.director.first_name, d.director.last_name]
+          );
+          directorId = dRes.rows[0].id;
+        }
+        await pool.query(
+          "INSERT INTO movie_directors (movie_id, director_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+          [movieId, directorId]
+        );
+      }
+      // Acteurs
+      let orderIdx = 0;
+      for (const a of actors) {
+        let actorId = a.actor.id;
+        if (!actorId) {
+          const aRes = await pool.query(
+            "INSERT INTO actors (first_name, last_name) VALUES ($1, $2) RETURNING id",
+            [a.actor.first_name, a.actor.last_name]
+          );
+          actorId = aRes.rows[0].id;
+        }
+        await pool.query(
+          "INSERT INTO movie_actors (movie_id, actor_id, character_name, role_type, order_index) VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING",
+          [movieId, actorId, a.character_name, a.role, orderIdx++]
+        );
+      }
+      res.status(201).json({ success: true, movie_id: movieId });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Erreur lors de l'ajout du film" });
+    }
+  }
+);
+
+// Route pour vérifier un utilisateur (admin seulement)
+app.put("/users/:id/verify", authenticateToken, isAdmin, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      "UPDATE users SET is_verified = true WHERE id = $1 RETURNING id, is_verified",
+      [id]
     );
-    const movieId = filmRes.rows[0].id;
-    // Genres
-    for (const g of genres) {
-      let genreId = g.id;
-      if (!genreId) {
-        const gRes = await pool.query('INSERT INTO genres (name) VALUES ($1) RETURNING id', [g.name]);
-        genreId = gRes.rows[0].id;
-      }
-      await pool.query('INSERT INTO movie_genres (movie_id, genre_id) VALUES ($1, $2) ON CONFLICT DO NOTHING', [movieId, genreId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Utilisateur non trouvé" });
     }
-    // Studios
-    for (const s of studios) {
-      let studioId = s.studio.id;
-      if (!studioId) {
-        const sRes = await pool.query('INSERT INTO studios (name) VALUES ($1) RETURNING id', [s.studio.name]);
-        studioId = sRes.rows[0].id;
-      }
-      await pool.query('INSERT INTO movie_studios (movie_id, studio_id, role) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING', [movieId, studioId, s.role]);
-    }
-    // Réalisateurs
-    for (const d of directors) {
-      let directorId = d.director.id;
-      if (!directorId) {
-        const dRes = await pool.query('INSERT INTO directors (first_name, last_name) VALUES ($1, $2) RETURNING id', [d.director.first_name, d.director.last_name]);
-        directorId = dRes.rows[0].id;
-      }
-      await pool.query('INSERT INTO movie_directors (movie_id, director_id) VALUES ($1, $2) ON CONFLICT DO NOTHING', [movieId, directorId]);
-    }
-    // Acteurs
-    let orderIdx = 0;
-    for (const a of actors) {
-      let actorId = a.actor.id;
-      if (!actorId) {
-        const aRes = await pool.query('INSERT INTO actors (first_name, last_name) VALUES ($1, $2) RETURNING id', [a.actor.first_name, a.actor.last_name]);
-        actorId = aRes.rows[0].id;
-      }
-      await pool.query('INSERT INTO movie_actors (movie_id, actor_id, character_name, role_type, order_index) VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING', [movieId, actorId, a.character_name, a.role, orderIdx++]);
-    }
-    res.status(201).json({ success: true, movie_id: movieId });
+
+    res.json({
+      message: "Utilisateur vérifié avec succès",
+      user: result.rows[0],
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Erreur lors de l'ajout du film" });
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la vérification de l'utilisateur" });
+  }
+});
+
+// Route pour annuler la vérification d'un utilisateur (admin seulement)
+app.put("/users/:id/unverify", authenticateToken, isAdmin, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      "UPDATE users SET is_verified = false WHERE id = $1 RETURNING id, is_verified",
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Utilisateur non trouvé" });
+    }
+
+    res.json({
+      message: "Vérification de l'utilisateur annulée avec succès",
+      user: result.rows[0],
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      error: "Erreur lors de l'annulation de la vérification de l'utilisateur",
+    });
+  }
+});
+
+// Route pour récupérer la liste des utilisateurs
+app.get("/users", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        u.id,
+        u.username,
+        u.created_at,
+        u.is_verified,
+        u.is_admin,
+        COUNT(r.id) as reviews_count
+      FROM users u
+      LEFT JOIN reviews r ON u.id = r.user_id
+      GROUP BY u.id
+      ORDER BY u.created_at DESC
+    `);
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la récupération des utilisateurs" });
+  }
+});
+
+// Route pour récupérer les détails d'un utilisateur
+app.get("/users/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      "SELECT id, username, email, first_name, last_name, nationality, bio, created_at, is_verified, is_admin FROM users WHERE id = $1",
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Utilisateur non trouvé" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la récupération de l'utilisateur" });
+  }
+});
+
+// Route pour récupérer les avis d'un utilisateur spécifique
+app.get("/users/:id/reviews", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      `
+      SELECT 
+        r.*,
+        m.title as movie_title,
+        m.poster
+      FROM reviews r
+      JOIN movies m ON r.movie_id = m.id
+      WHERE r.user_id = $1
+      ORDER BY r.created_at DESC
+    `,
+      [id]
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur lors de la récupération des avis" });
+  }
+});
+
+// Route pour récupérer la tier list d'un utilisateur spécifique
+app.get("/users/:id/tierlist", async (req, res) => {
+  const { id } = req.params;
+  try {
+    // Vérifie d'abord si l'utilisateur existe
+    const userExists = await pool.query("SELECT id FROM users WHERE id = $1", [
+      id,
+    ]);
+
+    if (userExists.rows.length === 0) {
+      return res.status(404).json({ error: "Utilisateur non trouvé" });
+    }
+
+    // Récupérer l'ID de la tier list de l'utilisateur
+    let tierListResult = await pool.query(
+      "SELECT id FROM tier_lists WHERE user_id = $1 LIMIT 1",
+      [id]
+    );
+
+    let tierListId;
+    if (tierListResult.rows.length === 0) {
+      // Créer une nouvelle tier list pour l'utilisateur
+      const newTierList = await pool.query(
+        "INSERT INTO tier_lists (user_id, title, description) VALUES ($1, $2, $3) RETURNING id",
+        [id, "Ma Tier List", "Tier list personnelle"]
+      );
+      tierListId = newTierList.rows[0].id;
+
+      // Créer les tiers par défaut (S, A, B, C, D)
+      const defaultTiers = [
+        { name: "S", color: "#FFD700", order: 1 },
+        { name: "A", color: "#FF6B6B", order: 2 },
+        { name: "B", color: "#4ECDC4", order: 3 },
+        { name: "C", color: "#45B7D1", order: 4 },
+        { name: "D", color: "#96CEB4", order: 5 },
+      ];
+
+      for (const tier of defaultTiers) {
+        await pool.query(
+          "INSERT INTO tiers (tier_list_id, name, color, order_index) VALUES ($1, $2, $3, $4)",
+          [tierListId, tier.name, tier.color, tier.order]
+        );
+      }
+    } else {
+      tierListId = tierListResult.rows[0].id;
+    }
+
+    // Récupérer la tier list complète avec les films classés
+    const result = await pool.query(
+      `SELECT 
+        t.id as tier_id,
+        t.name as tier_name,
+        t.color as tier_color,
+        t.order_index as tier_order,
+        tlm.movie_id,
+        tlm.order_index,
+        m.title,
+        m.poster,
+        m.id as movie_id
+       FROM tiers t
+       LEFT JOIN tier_list_movies tlm ON t.id = tlm.tier_id
+       LEFT JOIN movies m ON tlm.movie_id = m.id
+       WHERE t.tier_list_id = $1
+       ORDER BY t.order_index, tlm.order_index NULLS LAST`,
+      [tierListId]
+    );
+
+    // Organiser les données par tier
+    const tierList = {};
+    result.rows.forEach((row) => {
+      if (!tierList[row.tier_name]) {
+        tierList[row.tier_name] = {
+          id: row.tier_id,
+          color: row.tier_color,
+          order: row.tier_order,
+          movies: [],
+        };
+      }
+      if (row.movie_id) {
+        tierList[row.tier_name].movies.push({
+          id: row.movie_id,
+          title: row.title,
+          poster: row.poster,
+        });
+      }
+    });
+
+    res.json(tierList);
+  } catch (err) {
+    console.error("Erreur lors de la récupération de la tier list:", err);
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la récupération de la tier list" });
   }
 });
 
