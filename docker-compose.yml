@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   client:
@@ -37,10 +37,10 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
-    volumes:
-      - ./dump.sql:/docker-entrypoint-initdb.d/dump.sql:ro
-      - ./fix_sequences.sql:/docker-entrypoint-initdb.d/fix_sequences.sql:ro
-      - pgdata:/var/lib/postgresql/data
+    # volumes:
+    # - ./dump.sql:/docker-entrypoint-initdb.d/dump.sql:ro
+    # - ./fix_sequences.sql:/docker-entrypoint-initdb.d/fix_sequences.sql:ro
+    # - pgdata:/var/lib/postgresql/data
 
   minio:
     image: minio/minio
@@ -57,4 +57,3 @@ services:
 volumes:
   pgdata:
   minio_data:
-
