@@ -42,7 +42,7 @@ docker exec -it wikicine-db-1 psql -U postgres -d filmdb -f /tmp/dump.sql
      ```
    - Exporter les images :
      ```sh
-     docker cp <nom_conteneur_minio>:/data/wikicine-images ./wikicine-images-backup
+     docker cp wikicine-minio-1:/data/wikicine-images ./wikicine-images-backup
      ```
 
 2. **Transférer le dossier `wikicine-images-backup`** à la machine cible (clé USB, réseau, etc.)
@@ -54,11 +54,11 @@ docker exec -it wikicine-db-1 psql -U postgres -d filmdb -f /tmp/dump.sql
      ```
    - Créer le dossier dans le conteneur (si besoin) :
      ```sh
-     docker exec <nom_conteneur_minio> mkdir -p /data/wikicine-images
+     docker exec wikicine-minio-1 mkdir -p /data/wikicine-images
      ```
    - Importer les images :
      ```sh
-     docker cp ./wikicine-images-backup/. <nom_conteneur_minio>:/data/wikicine-images
+     docker cp ./wikicine-images-backup/. wikicine-minio-1:/data/wikicine-images
      ```
 
 4. **Vérifier dans MinIO (http://localhost:9001)** que les images sont bien présentes.
