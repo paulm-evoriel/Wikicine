@@ -59,7 +59,7 @@ export default function MovieCard() {
             }}
           >
             <img
-              src={`${API_URL}${movie.poster}`}
+              src={movie.poster}
               alt={`Affiche de ${movie.title}`}
               className={
                 i === 1
