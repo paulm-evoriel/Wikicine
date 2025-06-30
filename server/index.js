@@ -796,6 +796,17 @@ app.post('/movies', authenticateToken, upload.single('poster'), async (req, res)
   }
 });
 
+// Route pour récupérer la liste des utilisateurs
+app.get('/users', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT id, username, email, created_at FROM users');
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erreur lors de la récupération des utilisateurs' });
+  }
+});
+
 app.listen(5000, () => {
   console.log("Backend running on port 5000");
 });
