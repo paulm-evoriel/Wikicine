@@ -38,6 +38,8 @@ export default function Home({ theme, user, setUser }) {
     ? latestMovies
     : latestMovies.slice(0, 5);
 
+  console.log("displayedMovies", displayedMovies);
+
   return (
     <div className="bg-base-100 min-h-screen text-base-content">
       {/* HERO */}
