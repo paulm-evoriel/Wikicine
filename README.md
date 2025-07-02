@@ -1,4 +1,4 @@
-To run the app  juste execute the `up.bat` file
+To run the app just execute the `up.bat` file
 
 Wikicine is a collaborative film rating and review platform where every member can contribute by sharing their opinions, writing reviews, and rating movies. The platform is moderated to ensure quality content and respectful discussions.
 
